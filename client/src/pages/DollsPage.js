@@ -6,6 +6,7 @@ import BodyMakeup from '../components/BodyMakeup';
 import ImageViewer from '../components/ImageViewer';
 import PositionableImage from '../components/PositionableImage';
 import ImagePositionEditor from '../components/ImagePositionEditor';
+import { apiGet, apiPost, apiPut, apiDelete, apiUpload } from '../utils/api';
 import {
   DndContext, 
   closestCenter,
@@ -361,7 +362,7 @@ const SortableDollCard = ({ head, type, onImageClick, onShowDetails, onEdit, onD
   );
 };
 
-const DollsPage = () => {
+const DollsPage = ({ currentUser }) => {
   const [dollHeads, setDollHeads] = useState([]);
   const [dollBodies, setDollBodies] = useState([]);
   const [showAddOptions, setShowAddOptions] = useState(false);
@@ -582,28 +583,27 @@ const DollsPage = () => {
 
   const fetchDollHeads = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/doll-heads');
-      const data = await response.json();
-      setDollHeads(data);
+      const data = await apiGet('/api/doll-heads');
+      setDollHeads(data || []);
     } catch (error) {
       console.error('获取娃头数据失败:', error);
+      setDollHeads([]);
     }
   };
 
   const fetchDollBodies = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/doll-bodies');
-      const data = await response.json();
-      setDollBodies(data);
+      const data = await apiGet('/api/doll-bodies');
+      setDollBodies(data || []);
     } catch (error) {
       console.error('获取娃体数据失败:', error);
+      setDollBodies([]);
     }
   };
   
   const fetchDollStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/dolls/stats');
-      const data = await response.json();
+      const data = await apiGet('/api/dolls/stats');
       setDollStats(data);
     } catch (error) {
       console.error('获取娃娃统计数据失败:', error);
@@ -613,15 +613,11 @@ const DollsPage = () => {
   // 执行搜索
   const performSearch = async (term) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/dolls/search/${encodeURIComponent(term)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data);
-      } else {
-        setSearchResults([]);
-      }
+      const data = await apiGet(`/api/dolls/search/${encodeURIComponent(term)}`);
+      setSearchResults(data || []);
     } catch (error) {
       console.error('搜索失败:', error);
+      setSearchResults([]);
       setSearchResults([]);
     }
   };
@@ -1298,7 +1294,7 @@ const DollsPage = () => {
   return (
     <div className="page-content">
       <div className="page-header">
-        <h1>休息日的娃柜</h1>
+        <h1>{currentUser?.username || '我'}的娃柜</h1>
         
         <div className="view-mode-buttons">
           <button 

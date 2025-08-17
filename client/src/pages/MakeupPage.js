@@ -3,6 +3,7 @@ import ImageUpload from '../components/ImageUpload';
 import ImageViewer from '../components/ImageViewer';
 import CopyableText from '../components/CopyableText';
 import './MakeupPage.css';
+import { apiGet, apiPost, apiPut, apiDelete, apiUpload } from '../utils/api';
 import {
   DndContext, 
   closestCenter,
@@ -101,7 +102,7 @@ const SortableArtistCard = ({ artist, isFavorite, onToggleFavorite, onShowDetail
   );
 };
 
-const MakeupPage = () => {
+const MakeupPage = ({ currentUser }) => {
   const [makeupArtists, setMakeupArtists] = useState([]);
   const [filteredArtists, setFilteredArtists] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -161,22 +162,23 @@ const MakeupPage = () => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
-      setMakeupArtists(data);
-      setFilteredArtists(data); // 初始化过滤结果
+      const data = await apiGet('/api/makeup-artists');
+      setMakeupArtists(data || []);
+      setFilteredArtists(data || []); // 初始化过滤结果
     } catch (error) {
       console.error('获取妆师数据失败:', error);
+      setMakeupArtists([]);
+      setFilteredArtists([]);
     }
   };
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-appointments');
-      const data = await response.json();
-      setAppointments(data);
+      const data = await apiGet('/api/makeup-appointments');
+      setAppointments(data || []);
     } catch (error) {
       console.error('获取约妆数据失败:', error);
+      setAppointments([]);
     }
   };
 
@@ -386,6 +388,37 @@ const MakeupPage = () => {
     }
   };
 
+  // 从约妆记录创建妆师卡片
+  const createArtistFromAppointment = async (appointmentId, artistName) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/makeup-artists/create-from-appointment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ appointment_id: appointmentId }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.existed) {
+          alert(`妆师 "${artistName}" 已存在妆师档案中！`);
+        } else if (result.created) {
+          alert(`成功为 "${artistName}" 创建妆师卡片！`);
+          fetchMakeupArtists(); // 刷新妆师列表
+          setActiveTab('artists'); // 切换到妆师列表标签
+        }
+      } else {
+        const error = await response.json();
+        alert(`创建失败: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('创建妆师卡片失败:', error);
+      alert('创建妆师卡片失败，请重试');
+    }
+  };
+
   // 分离收藏和普通妆师（使用过滤后的数据）
   const favoriteArtists = filteredArtists.filter(artist => artist.is_favorite);
   const regularArtists = filteredArtists.filter(artist => !artist.is_favorite);
@@ -461,7 +494,7 @@ const MakeupPage = () => {
   return (
     <div className="page-content">
       <div className="page-header">
-        <h1>妆师工坊</h1>
+        <h1>{currentUser?.username || '我'}的妆师档案</h1>
         <div className="header-tabs">
           <button 
             className={`tab-button ${activeTab === 'artists' ? 'active' : ''}`}
@@ -627,13 +660,22 @@ const MakeupPage = () => {
                           )}
                         </div>
                       </div>
-                      <button 
-                        className="cancel-appointment-btn"
-                        onClick={() => cancelAppointment(appointment.head_id)}
-                        title="取消约妆"
-                      >
-                        ×
-                      </button>
+                      <div className="appointment-actions">
+                        <button 
+                          className="create-artist-btn"
+                          onClick={() => createArtistFromAppointment(appointment.id, appointment.makeup_artist_name)}
+                          title="创建妆师卡片"
+                        >
+                          💳
+                        </button>
+                        <button 
+                          className="cancel-appointment-btn"
+                          onClick={() => cancelAppointment(appointment.head_id)}
+                          title="取消约妆"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                     
                     {appointment.expected_arrival && (

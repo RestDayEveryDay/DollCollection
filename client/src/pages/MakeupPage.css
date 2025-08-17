@@ -137,6 +137,35 @@
   font-weight: bold;
 }
 
+.appointment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.create-artist-btn {
+  background: #A8D8B8;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(168, 216, 184, 0.3);
+}
+
+.create-artist-btn:hover {
+  background: #98C8A8;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(168, 216, 184, 0.4);
+}
+
 .cancel-appointment-btn {
   background: #ff6b6b;
   color: white;

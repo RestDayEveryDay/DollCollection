@@ -8,6 +8,7 @@ const ImagePositionEditor = ({
   onPositionChange,
   onSave,
   onCancel,
+  onClose,
   isOpen = false 
 }) => {
   const [position, setPosition] = useState(initialPosition);
@@ -122,7 +123,7 @@ const ImagePositionEditor = ({
       <div className="image-position-editor">
         <div className="editor-header">
           <h3>调整图片显示区域</h3>
-          <button className="close-btn" onClick={onCancel}>×</button>
+          <button className="close-btn" onClick={onCancel || onClose}>×</button>
         </div>
         
         <div className="editor-content">
@@ -209,7 +210,7 @@ const ImagePositionEditor = ({
         </div>
 
         <div className="editor-actions">
-          <button className="cancel-action-btn" onClick={onCancel}>
+          <button className="cancel-action-btn" onClick={onCancel || onClose}>
             取消
           </button>
           <button className="save-action-btn" onClick={handleSave}>

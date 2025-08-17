@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ImageUpload from './ImageUpload';
 import ImageViewer from './ImageViewer';
+import PositionableImage from './PositionableImage';
+import ImagePositionEditor from './ImagePositionEditor';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 import {
   DndContext, 
   closestCenter,
@@ -83,7 +86,7 @@ const getPaymentStatusInfo = (item) => {
 };
 
 // 可拖拽的服饰卡片组件
-const SortableWardrobeCard = ({ item, onImageClick, onEdit, onDelete, onConfirmArrival, onPaymentStatusChange }) => {
+const SortableWardrobeCard = ({ item, onImageClick, onEdit, onDelete, onConfirmArrival, onPaymentStatusChange, onEditImagePosition }) => {
   const {
     attributes,
     listeners,
@@ -118,17 +121,34 @@ const SortableWardrobeCard = ({ item, onImageClick, onEdit, onDelete, onConfirmA
       className={`wardrobe-card ${item.ownership_status} ${isDragging ? 'dragging' : ''} ${paymentInfo.className}`}
     >
       {item.profile_image_url && (
-        <img 
-          src={item.profile_image_url} 
-          alt={item.name} 
-          className="wardrobe-image clickable-image" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onImageClick(item.profile_image_url, item.name);
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
-          title="点击查看大图"
-        />
+        <div className="wardrobe-image-container">
+          <PositionableImage
+            src={item.profile_image_url}
+            alt={item.name}
+            className="wardrobe-image clickable-image"
+            positionX={item.image_position_x || 50}
+            positionY={item.image_position_y || 50}
+            scale={item.image_scale || 100}
+            onClick={(e) => {
+              e.stopPropagation();
+              onImageClick(item.profile_image_url, item.name);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            title="点击查看大图"
+          />
+          <button 
+            className="image-position-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('按钮被点击了，item:', item);
+              onEditImagePosition(item);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            title="调整图片显示位置"
+          >
+            🎯
+          </button>
+        </div>
       )}
       
       <div className="wardrobe-info">
@@ -275,6 +295,7 @@ const WardrobeCategory = ({ category, categoryName }) => {
   const [editingItem, setEditingItem] = useState(null);
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [viewingImage, setViewingImage] = useState({ url: '', title: '' });
+  const [editingImagePosition, setEditingImagePosition] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -287,7 +308,10 @@ const WardrobeCategory = ({ category, categoryName }) => {
     final_payment: '',
     final_payment_date: '',
     profile_image_url: '',
-    sizes: []
+    sizes: [],
+    image_position_x: 50,
+    image_position_y: 50,
+    image_scale: 100
   });
 
   // 拖拽传感器配置
@@ -431,7 +455,10 @@ const WardrobeCategory = ({ category, categoryName }) => {
       final_payment: '',
       final_payment_date: '',
       profile_image_url: '',
-      sizes: []
+      sizes: [],
+      image_position_x: 50,
+      image_position_y: 50,
+      image_scale: 100
     });
   };
 
@@ -459,7 +486,10 @@ const WardrobeCategory = ({ category, categoryName }) => {
       final_payment: item.final_payment || '',
       final_payment_date: item.final_payment_date || '',
       profile_image_url: item.profile_image_url || '',
-      sizes: parsedSizes
+      sizes: parsedSizes,
+      image_position_x: item.image_position_x || 50,
+      image_position_y: item.image_position_y || 50,
+      image_scale: item.image_scale || 100
     });
     setShowAddForm(true);
   };
@@ -540,6 +570,28 @@ const WardrobeCategory = ({ category, categoryName }) => {
     setViewingImage({ url: '', title: '' });
   };
 
+  // 处理图片位置更新
+  const handleImagePositionUpdate = async (newPosition) => {
+    if (editingItem) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/wardrobe/${editingItem.id}/image-position`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPosition),
+        });
+
+        if (response.ok) {
+          console.log('图片位置更新成功');
+          fetchItems();
+        }
+      } catch (error) {
+        console.error('更新图片位置失败:', error);
+      }
+    }
+  };
+
   // 处理尺寸选择
   const availableSizes = ['ob11', '四分', '70', '75'];
   
@@ -559,6 +611,36 @@ const WardrobeCategory = ({ category, categoryName }) => {
 
   const clearSearch = () => {
     setSearchTerm('');
+  };
+
+  // 处理编辑图片位置
+  const handleEditImagePosition = (item) => {
+    console.log('编辑图片位置:', item);
+    setEditingImagePosition(item);
+  };
+
+  // 处理图片位置更新
+  const handleSaveImagePosition = async (newPosition) => {
+    if (editingImagePosition) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/wardrobe/${editingImagePosition.id}/image-position`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPosition),
+        });
+
+        if (response.ok) {
+          console.log('图片位置更新成功');
+          return true;
+        }
+      } catch (error) {
+        console.error('更新图片位置失败:', error);
+        return false;
+      }
+    }
+    return false;
   };
 
   // 分离已到家和空气商品（使用过滤后的数据）
@@ -765,6 +847,27 @@ const WardrobeCategory = ({ category, categoryName }) => {
               currentImage={formData.profile_image_url}
               placeholder="选择服饰图片"
             />
+            {formData.profile_image_url && editingItem && (
+              <ImagePositionEditor
+                imageUrl={formData.profile_image_url}
+                initialX={formData.image_position_x}
+                initialY={formData.image_position_y}
+                initialScale={formData.image_scale}
+                onPositionChange={(x, y, scale) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    image_position_x: x,
+                    image_position_y: y,
+                    image_scale: scale
+                  }));
+                  handleImagePositionUpdate({
+                    image_position_x: x,
+                    image_position_y: y,
+                    image_scale: scale
+                  });
+                }}
+              />
+            )}
           </div>
 
           <button type="submit">{editingItem ? '保存更改' : '添加服饰'}</button>
@@ -803,6 +906,7 @@ const WardrobeCategory = ({ category, categoryName }) => {
                       onDelete={handleDelete}
                       onConfirmArrival={handleConfirmArrival}
                       onPaymentStatusChange={handlePaymentStatusChange}
+                      onEditImagePosition={handleEditImagePosition}
                     />
                   ))}
                 </div>
@@ -850,6 +954,7 @@ const WardrobeCategory = ({ category, categoryName }) => {
                       onDelete={handleDelete}
                       onConfirmArrival={handleConfirmArrival}
                       onPaymentStatusChange={handlePaymentStatusChange}
+                      onEditImagePosition={handleEditImagePosition}
                     />
                   ))}
                 </div>
@@ -878,6 +983,31 @@ const WardrobeCategory = ({ category, categoryName }) => {
         isOpen={imageViewerOpen}
         onClose={handleCloseImageViewer}
         title={viewingImage.title}
+      />
+
+      <ImagePositionEditor
+        imageUrl={editingImagePosition?.profile_image_url}
+        initialPosition={{
+          x: editingImagePosition?.image_position_x || 50,
+          y: editingImagePosition?.image_position_y || 50
+        }}
+        initialScale={editingImagePosition?.image_scale || 100}
+        isOpen={!!editingImagePosition}
+        onSave={({ position, scale }) => {
+          if (editingImagePosition) {
+            handleSaveImagePosition({
+              image_position_x: position.x,
+              image_position_y: position.y,
+              image_scale: scale
+            }).then(() => {
+              setEditingImagePosition(null);
+              fetchItems();
+            });
+          }
+        }}
+        onCancel={() => {
+          setEditingImagePosition(null);
+        }}
       />
     </div>
   );

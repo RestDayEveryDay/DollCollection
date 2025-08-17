@@ -4,4 +4,10 @@
   height: 100%;
   background-color: #f8f9fa;
   transition: background-position 0.3s ease, background-size 0.3s ease;
+  cursor: pointer;
+}
+
+.positionable-image-container:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease, background-position 0.3s ease, background-size 0.3s ease;
 }

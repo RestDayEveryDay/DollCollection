@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const auth = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -443,20 +444,131 @@ function addMissingColumns() {
         }
       });
     }
+    
+    // 检查并添加图片位置字段
+    if (!columnNames.includes('image_position_x')) {
+      db.run("ALTER TABLE wardrobe_items ADD COLUMN image_position_x REAL DEFAULT 50", (err) => {
+        if (err) {
+          console.error('添加wardrobe_items表image_position_x字段失败:', err);
+        } else {
+          console.log('成功添加wardrobe_items表image_position_x字段');
+        }
+      });
+    }
+    
+    if (!columnNames.includes('image_position_y')) {
+      db.run("ALTER TABLE wardrobe_items ADD COLUMN image_position_y REAL DEFAULT 50", (err) => {
+        if (err) {
+          console.error('添加wardrobe_items表image_position_y字段失败:', err);
+        } else {
+          console.log('成功添加wardrobe_items表image_position_y字段');
+        }
+      });
+    }
+    
+    if (!columnNames.includes('image_scale')) {
+      db.run("ALTER TABLE wardrobe_items ADD COLUMN image_scale REAL DEFAULT 100", (err) => {
+        if (err) {
+          console.error('添加wardrobe_items表image_scale字段失败:', err);
+        } else {
+          console.log('成功添加wardrobe_items表image_scale字段');
+        }
+      });
+    }
   });
 }
 
+// ==================== 认证相关路由 ====================
+
+// 注册路由
+app.post('/api/auth/register', async (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: '用户名和密码不能为空' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: '密码长度至少6位' });
+  }
+
+  try {
+    const result = await auth.register(username, password);
+    if (result.success) {
+      const loginResult = await auth.login(username, password);
+      res.json({
+        token: loginResult.token,
+        user: { id: result.userId, username: username }
+      });
+    } else {
+      res.status(400).json({ error: result.error });
+    }
+  } catch (error) {
+    console.error('注册失败:', error);
+    res.status(500).json({ error: '注册失败' });
+  }
+});
+
+// 登录路由
+app.post('/api/auth/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: '用户名和密码不能为空' });
+  }
+
+  try {
+    const result = await auth.login(username, password);
+    if (result.success) {
+      res.json({
+        token: result.token,
+        user: { id: result.userId, username: username }
+      });
+    } else {
+      res.status(401).json({ error: result.error });
+    }
+  } catch (error) {
+    console.error('登录失败:', error);
+    res.status(500).json({ error: '登录失败' });
+  }
+});
+
+// 验证token路由
+app.get('/api/auth/verify', auth.authMiddleware, (req, res) => {
+  res.json({ valid: true, userId: req.userId });
+});
+
+// 修改用户名
+app.put('/api/auth/change-username', auth.authMiddleware, async (req, res) => {
+  const { newUsername } = req.body;
+  
+  if (!newUsername || newUsername.trim() === '') {
+    return res.status(400).json({ error: '用户名不能为空' });
+  }
+  
+  try {
+    const result = await auth.changeUsername(req.userId, newUsername.trim());
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ==================== 需要认证的API路由 ====================
+// 从这里开始，所有路由都需要认证
+
 // 娃娃统计API
-app.get('/api/dolls/stats', (req, res) => {
+app.get('/api/dolls/stats', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   // 获取所有娃头数据
-  db.all('SELECT * FROM doll_heads', [], (err, heads) => {
+  db.all('SELECT * FROM doll_heads WHERE user_id = ?', [userId], (err, heads) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
     
     // 获取所有娃体数据
-    db.all('SELECT * FROM doll_bodies', [], (err, bodies) => {
+    db.all('SELECT * FROM doll_bodies WHERE user_id = ?', [userId], (err, bodies) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -589,7 +701,7 @@ app.get('/api/dolls/stats', (req, res) => {
 });
 
 // 文件上传API
-app.post('/api/upload', upload.single('image'), (req, res) => {
+app.post('/api/upload', auth.authMiddleware, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: '没有上传文件' });
@@ -607,7 +719,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 // 删除文件API
-app.delete('/api/upload/:filename', (req, res) => {
+app.delete('/api/upload/:filename', auth.authMiddleware, (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'uploads', filename);
   
@@ -621,8 +733,9 @@ app.delete('/api/upload/:filename', (req, res) => {
 });
 
 // 其他API路由保持简化版本
-app.get('/api/doll-heads', (req, res) => {
-  db.all('SELECT * FROM doll_heads ORDER BY sort_order ASC, created_at ASC', [], (err, rows) => {
+app.get('/api/doll-heads', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  db.all('SELECT * FROM doll_heads WHERE user_id = ? ORDER BY sort_order ASC, created_at ASC', [userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -631,7 +744,8 @@ app.get('/api/doll-heads', (req, res) => {
   });
 });
 
-app.post('/api/doll-heads', (req, res) => {
+app.post('/api/doll-heads', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { 
     name, company, skin_tone, head_circumference, size_category,
     original_price, actual_price, total_price, deposit, final_payment, final_payment_date,
@@ -651,8 +765,9 @@ app.post('/api/doll-heads', (req, res) => {
     release_date, received_date, 
     purchase_channel, ownership_status, 
     profile_image_url,
-    image_position_x, image_position_y, image_scale
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    image_position_x, image_position_y, image_scale,
+    user_id
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   
   const params = [
     name, company, skin_tone, head_circumference, size_category,
@@ -660,7 +775,8 @@ app.post('/api/doll-heads', (req, res) => {
     release_date, received_date, 
     purchase_channel, ownership_status || 'owned', 
     profile_image_url,
-    image_position_x || 50, image_position_y || 50, image_scale || 100
+    image_position_x || 50, image_position_y || 50, image_scale || 100,
+    userId
   ];
   
   db.run(sql, params, function(err) {
@@ -675,7 +791,8 @@ app.post('/api/doll-heads', (req, res) => {
   });
 });
 
-app.put('/api/doll-heads/:id', (req, res) => {
+app.put('/api/doll-heads/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { 
     name, company, skin_tone, head_circumference, size_category,
     original_price, actual_price, total_price, deposit, final_payment, final_payment_date,
@@ -697,7 +814,7 @@ app.put('/api/doll-heads/:id', (req, res) => {
     purchase_channel = ?, ownership_status = ?, 
     profile_image_url = ?,
     image_position_x = ?, image_position_y = ?, image_scale = ?
-    WHERE id = ?`;
+    WHERE id = ? AND user_id = ?`;
     
   const params = [
     name, company, skin_tone, head_circumference, size_category,
@@ -705,7 +822,7 @@ app.put('/api/doll-heads/:id', (req, res) => {
     release_date, received_date, 
     purchase_channel, ownership_status || 'owned', 
     profile_image_url,
-    image_position_x || 50, image_position_y || 50, image_scale || 100, id
+    image_position_x || 50, image_position_y || 50, image_scale || 100, id, userId
   ];
   
   db.run(sql, params, function(err) {
@@ -721,9 +838,10 @@ app.put('/api/doll-heads/:id', (req, res) => {
   });
 });
 
-app.delete('/api/doll-heads/:id', (req, res) => {
-  const sql = 'DELETE FROM doll_heads WHERE id = ?';
-  const params = [req.params.id];
+app.delete('/api/doll-heads/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  const sql = 'DELETE FROM doll_heads WHERE id = ? AND user_id = ?';
+  const params = [req.params.id, userId];
   
   db.run(sql, params, function(err) {
     if (err) {
@@ -738,8 +856,9 @@ app.delete('/api/doll-heads/:id', (req, res) => {
   });
 });
 
-app.get('/api/doll-bodies', (req, res) => {
-  db.all('SELECT * FROM doll_bodies ORDER BY sort_order ASC, created_at ASC', [], (err, rows) => {
+app.get('/api/doll-bodies', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  db.all('SELECT * FROM doll_bodies WHERE user_id = ? ORDER BY sort_order ASC, created_at ASC', [userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -748,7 +867,8 @@ app.get('/api/doll-bodies', (req, res) => {
   });
 });
 
-app.post('/api/doll-bodies', (req, res) => {
+app.post('/api/doll-bodies', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { 
     name, company, skin_tone, head_circumference, size_category,
     neck_circumference, shoulder_width,
@@ -770,8 +890,9 @@ app.post('/api/doll-bodies', (req, res) => {
     release_date, received_date, 
     purchase_channel, ownership_status, 
     profile_image_url,
-    image_position_x, image_position_y, image_scale
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    image_position_x, image_position_y, image_scale,
+    user_id
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   
   const params = [
     name, company, skin_tone, head_circumference, size_category,
@@ -780,7 +901,8 @@ app.post('/api/doll-bodies', (req, res) => {
     release_date, received_date, 
     purchase_channel, ownership_status || 'owned', 
     profile_image_url,
-    image_position_x || 50, image_position_y || 50, image_scale || 100
+    image_position_x || 50, image_position_y || 50, image_scale || 100,
+    userId
   ];
   
   db.run(sql, params, function(err) {
@@ -795,7 +917,8 @@ app.post('/api/doll-bodies', (req, res) => {
   });
 });
 
-app.put('/api/doll-bodies/:id', (req, res) => {
+app.put('/api/doll-bodies/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { 
     name, company, skin_tone, head_circumference, size_category,
     neck_circumference, shoulder_width,
@@ -844,7 +967,8 @@ app.put('/api/doll-bodies/:id', (req, res) => {
   });
 });
 
-app.delete('/api/doll-bodies/:id', (req, res) => {
+app.delete('/api/doll-bodies/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const sql = 'DELETE FROM doll_bodies WHERE id = ?';
   const params = [req.params.id];
   
@@ -862,7 +986,8 @@ app.delete('/api/doll-bodies/:id', (req, res) => {
 });
 
 // 娃头付款状态更新端点
-app.put('/api/doll-heads/:id/payment-status', (req, res) => {
+app.put('/api/doll-heads/:id/payment-status', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { payment_status } = req.body;
   
@@ -882,7 +1007,8 @@ app.put('/api/doll-heads/:id/payment-status', (req, res) => {
 });
 
 // 娃体付款状态更新端点
-app.put('/api/doll-bodies/:id/payment-status', (req, res) => {
+app.put('/api/doll-bodies/:id/payment-status', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { payment_status } = req.body;
   
@@ -902,15 +1028,16 @@ app.put('/api/doll-bodies/:id/payment-status', (req, res) => {
 });
 
 // 娃头到货确认端点
-app.put('/api/doll-heads/:id/confirm-arrival', (req, res) => {
+app.put('/api/doll-heads/:id/confirm-arrival', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { hasArrived } = req.body;
   
   // 只有选择"是"才更新为已到家
   if (hasArrived === true) {
-    const sql = `UPDATE doll_heads SET ownership_status = 'owned' WHERE id = ?`;
+    const sql = `UPDATE doll_heads SET ownership_status = 'owned' WHERE id = ? AND user_id = ?`;
     
-    db.run(sql, [id], function(err) {
+    db.run(sql, [id, userId], function(err) {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -928,15 +1055,16 @@ app.put('/api/doll-heads/:id/confirm-arrival', (req, res) => {
 });
 
 // 娃体到货确认端点
-app.put('/api/doll-bodies/:id/confirm-arrival', (req, res) => {
+app.put('/api/doll-bodies/:id/confirm-arrival', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { hasArrived } = req.body;
   
   // 只有选择"是"才更新为已到家
   if (hasArrived === true) {
-    const sql = `UPDATE doll_bodies SET ownership_status = 'owned' WHERE id = ?`;
+    const sql = `UPDATE doll_bodies SET ownership_status = 'owned' WHERE id = ? AND user_id = ?`;
     
-    db.run(sql, [id], function(err) {
+    db.run(sql, [id, userId], function(err) {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -954,7 +1082,8 @@ app.put('/api/doll-bodies/:id/confirm-arrival', (req, res) => {
 });
 
 // 妆容历史管理API
-app.get('/api/makeup-history/:headId', (req, res) => {
+app.get('/api/makeup-history/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   const sql = `SELECT hmh.*, ma.name as artist_name FROM head_makeup_history hmh
@@ -970,7 +1099,8 @@ app.get('/api/makeup-history/:headId', (req, res) => {
   });
 });
 
-app.post('/api/makeup-history', (req, res) => {
+app.post('/api/makeup-history', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { head_id, makeup_artist_id, makeup_artist_name, makeup_fee, notes, makeup_date, removal_date, image_url } = req.body;
   
   if (!head_id) {
@@ -995,7 +1125,8 @@ app.post('/api/makeup-history', (req, res) => {
   });
 });
 
-app.put('/api/makeup-history/:id', (req, res) => {
+app.put('/api/makeup-history/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { head_id, makeup_artist_id, makeup_artist_name, makeup_fee, notes, makeup_date, removal_date, image_url } = req.body;
   const id = req.params.id;
   
@@ -1023,7 +1154,8 @@ app.put('/api/makeup-history/:id', (req, res) => {
   });
 });
 
-app.delete('/api/makeup-history/:id', (req, res) => {
+app.delete('/api/makeup-history/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   
   db.run('DELETE FROM head_makeup_history WHERE id = ?', [id], function(err) {
@@ -1040,7 +1172,8 @@ app.delete('/api/makeup-history/:id', (req, res) => {
 });
 
 // 当前妆容管理API
-app.get('/api/current-makeup/:headId', (req, res) => {
+app.get('/api/current-makeup/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   const sql = `SELECT hcm.*, ma.name as artist_name FROM head_current_makeup hcm
@@ -1060,7 +1193,8 @@ app.get('/api/current-makeup/:headId', (req, res) => {
   });
 });
 
-app.post('/api/current-makeup', (req, res) => {
+app.post('/api/current-makeup', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { head_id, makeup_artist_id, makeup_artist_name, makeup_fee, notes, makeup_date, image_url, from_history_id } = req.body;
   
   if (!head_id || !makeup_date) {
@@ -1092,7 +1226,8 @@ app.post('/api/current-makeup', (req, res) => {
   });
 });
 
-app.delete('/api/current-makeup/:headId', (req, res) => {
+app.delete('/api/current-makeup/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   db.run('DELETE FROM head_current_makeup WHERE head_id = ?', [headId], function(err) {
@@ -1109,7 +1244,8 @@ app.delete('/api/current-makeup/:headId', (req, res) => {
 });
 
 // 约妆管理API
-app.get('/api/makeup-appointment/:headId', (req, res) => {
+app.get('/api/makeup-appointment/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   const sql = `SELECT hma.*, ma.name as artist_name FROM head_makeup_appointments hma
@@ -1129,7 +1265,8 @@ app.get('/api/makeup-appointment/:headId', (req, res) => {
   });
 });
 
-app.post('/api/makeup-appointment', (req, res) => {
+app.post('/api/makeup-appointment', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { head_id, makeup_artist_id, makeup_artist_name, makeup_fee, notes, expected_arrival } = req.body;
   
   if (!head_id) {
@@ -1161,7 +1298,8 @@ app.post('/api/makeup-appointment', (req, res) => {
   });
 });
 
-app.delete('/api/makeup-appointment/:headId', (req, res) => {
+app.delete('/api/makeup-appointment/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   db.run('DELETE FROM head_makeup_appointments WHERE head_id = ?', [headId], function(err) {
@@ -1178,7 +1316,8 @@ app.delete('/api/makeup-appointment/:headId', (req, res) => {
 });
 
 // 获取所有约妆信息API
-app.get('/api/makeup-appointments', (req, res) => {
+app.get('/api/makeup-appointments', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const sql = `SELECT hma.*, ma.name as artist_name, dh.name as head_name, dh.company as head_company 
                FROM head_makeup_appointments hma
                LEFT JOIN makeup_artists ma ON hma.makeup_artist_id = ma.id
@@ -1195,7 +1334,8 @@ app.get('/api/makeup-appointments', (req, res) => {
 });
 
 // 未约妆心仪妆师API
-app.get('/api/unmade-preferences/:headId', (req, res) => {
+app.get('/api/unmade-preferences/:headId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   
   const sql = `SELECT hup.*, ma.name, ma.specialty, ma.price_range, ma.contact 
@@ -1213,7 +1353,8 @@ app.get('/api/unmade-preferences/:headId', (req, res) => {
   });
 });
 
-app.post('/api/unmade-preferences', (req, res) => {
+app.post('/api/unmade-preferences', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { head_id, makeup_artist_id } = req.body;
   
   if (!head_id || !makeup_artist_id) {
@@ -1234,7 +1375,8 @@ app.post('/api/unmade-preferences', (req, res) => {
   });
 });
 
-app.delete('/api/unmade-preferences/:headId/:artistId', (req, res) => {
+app.delete('/api/unmade-preferences/:headId/:artistId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const headId = req.params.headId;
   const artistId = req.params.artistId;
   
@@ -1247,8 +1389,9 @@ app.delete('/api/unmade-preferences/:headId/:artistId', (req, res) => {
   });
 });
 
-app.get('/api/makeup-artists', (req, res) => {
-  db.all('SELECT * FROM makeup_artists ORDER BY sort_order ASC, created_at DESC', [], (err, rows) => {
+app.get('/api/makeup-artists', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  db.all('SELECT * FROM makeup_artists WHERE user_id = ? ORDER BY sort_order ASC, created_at DESC', [userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -1257,7 +1400,8 @@ app.get('/api/makeup-artists', (req, res) => {
   });
 });
 
-app.post('/api/makeup-artists', (req, res) => {
+app.post('/api/makeup-artists', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { name, contact, specialty, price_range, makeup_rules_image, note_template, is_favorite, when_available } = req.body;
   
   if (!name) {
@@ -1272,9 +1416,9 @@ app.post('/api/makeup-artists', (req, res) => {
   const safeWhenAvailable = when_available || '';
   const safeIsFavorite = is_favorite ? 1 : 0;
 
-  const sql = `INSERT INTO makeup_artists (name, contact, specialty, price_range, makeup_rules_image, note_template, is_favorite, when_available) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-  const params = [name, safeContact, safeSpecialty, safePriceRange, safeMakeupRulesImage, safeNoteTemplate, safeIsFavorite, safeWhenAvailable];
+  const sql = `INSERT INTO makeup_artists (name, contact, specialty, price_range, makeup_rules_image, note_template, is_favorite, when_available, user_id) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const params = [name, safeContact, safeSpecialty, safePriceRange, safeMakeupRulesImage, safeNoteTemplate, safeIsFavorite, safeWhenAvailable, userId];
   
   db.run(sql, params, function(err) {
     if (err) {
@@ -1288,7 +1432,8 @@ app.post('/api/makeup-artists', (req, res) => {
   });
 });
 
-app.put('/api/makeup-artists/:id', (req, res) => {
+app.put('/api/makeup-artists/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { name, contact, specialty, price_range, makeup_rules_image, note_template, is_favorite, when_available } = req.body;
   const id = req.params.id;
   
@@ -1307,8 +1452,8 @@ app.put('/api/makeup-artists/:id', (req, res) => {
   const sql = `UPDATE makeup_artists SET 
                name = ?, contact = ?, specialty = ?, price_range = ?, 
                makeup_rules_image = ?, note_template = ?, is_favorite = ?, when_available = ?
-               WHERE id = ?`;
-  const params = [name, safeContact, safeSpecialty, safePriceRange, safeMakeupRulesImage, safeNoteTemplate, safeIsFavorite, safeWhenAvailable, id];
+               WHERE id = ? AND user_id = ?`;
+  const params = [name, safeContact, safeSpecialty, safePriceRange, safeMakeupRulesImage, safeNoteTemplate, safeIsFavorite, safeWhenAvailable, id, userId];
   
   db.run(sql, params, function(err) {
     if (err) {
@@ -1323,10 +1468,11 @@ app.put('/api/makeup-artists/:id', (req, res) => {
   });
 });
 
-app.delete('/api/makeup-artists/:id', (req, res) => {
+app.delete('/api/makeup-artists/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   
-  db.run('DELETE FROM makeup_artists WHERE id = ?', [id], function(err) {
+  db.run('DELETE FROM makeup_artists WHERE id = ? AND user_id = ?', [id, userId], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -1339,7 +1485,8 @@ app.delete('/api/makeup-artists/:id', (req, res) => {
   });
 });
 
-app.post('/api/sort/makeup-artists', (req, res) => {
+app.post('/api/sort/makeup-artists', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { sortOrder } = req.body;
   
   if (!Array.isArray(sortOrder)) {
@@ -1368,8 +1515,99 @@ app.post('/api/sort/makeup-artists', (req, res) => {
   });
 });
 
+// 从约妆记录创建妆师卡片API
+app.post('/api/makeup-artists/create-from-appointment', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  const { appointment_id } = req.body;
+  
+  if (!appointment_id) {
+    return res.status(400).json({ error: 'Appointment ID is required' });
+  }
+  
+  // 先获取约妆记录的信息
+  db.get(`
+    SELECT 
+      makeup_artist_name,
+      notes,
+      makeup_fee,
+      created_at as appointment_date
+    FROM head_makeup_appointments 
+    WHERE id = ?
+  `, [appointment_id], (err, appointment) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    
+    // 检查是否已存在同名妆师
+    db.get(`
+      SELECT id, name FROM makeup_artists 
+      WHERE name = ?
+    `, [appointment.makeup_artist_name], (err, existingArtist) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      
+      if (existingArtist) {
+        // 如果妆师已存在，返回妆师信息
+        return res.json({ 
+          message: 'Artist already exists',
+          artist: existingArtist,
+          existed: true
+        });
+      }
+      
+      // 创建新妆师卡片
+      // 尝试从备注中提取价格范围信息
+      let priceRange = '';
+      if (appointment.makeup_fee) {
+        priceRange = `参考价格: ¥${appointment.makeup_fee}`;
+      }
+      
+      // 获取最大排序值
+      db.get('SELECT MAX(sort_order) as maxOrder FROM makeup_artists', [], (err, row) => {
+        const nextOrder = (row?.maxOrder || 0) + 1;
+        
+        const sql = `INSERT INTO makeup_artists 
+                     (name, contact, specialty, price_range, note_template, is_favorite, when_available, sort_order) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        
+        const params = [
+          appointment.makeup_artist_name,
+          '', // 联系方式留空，用户可以后续补充
+          '', // 专长留空
+          priceRange,
+          appointment.notes || '', // 使用约妆备注作为初始模板
+          0, // 默认不是收藏
+          '', // 可约时间留空
+          nextOrder
+        ];
+        
+        db.run(sql, params, function(err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+          
+          res.json({
+            message: 'Artist created successfully',
+            artist: {
+              id: this.lastID,
+              name: appointment.makeup_artist_name
+            },
+            created: true
+          });
+        });
+      });
+    });
+  });
+});
+
 // 娃体妆容管理API
-app.get('/api/body-makeup/:bodyId', (req, res) => {
+app.get('/api/body-makeup/:bodyId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const bodyId = req.params.bodyId;
   
   const sql = `SELECT bm.*, ma.name as artist_name FROM body_makeup bm
@@ -1389,7 +1627,8 @@ app.get('/api/body-makeup/:bodyId', (req, res) => {
   });
 });
 
-app.post('/api/body-makeup', (req, res) => {
+app.post('/api/body-makeup', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { body_id, makeup_artist_id, makeup_artist_name, makeup_fee, makeup_date, image_url } = req.body;
   
   if (!body_id) {
@@ -1421,7 +1660,8 @@ app.post('/api/body-makeup', (req, res) => {
   });
 });
 
-app.put('/api/body-makeup/:bodyId', (req, res) => {
+app.put('/api/body-makeup/:bodyId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { body_id, makeup_artist_id, makeup_artist_name, makeup_fee, makeup_date, image_url } = req.body;
   const bodyId = req.params.bodyId;
   
@@ -1449,7 +1689,8 @@ app.put('/api/body-makeup/:bodyId', (req, res) => {
   });
 });
 
-app.delete('/api/body-makeup/:bodyId', (req, res) => {
+app.delete('/api/body-makeup/:bodyId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const bodyId = req.params.bodyId;
   
   db.run('DELETE FROM body_makeup WHERE body_id = ?', [bodyId], function(err) {
@@ -1466,11 +1707,12 @@ app.delete('/api/body-makeup/:bodyId', (req, res) => {
 });
 
 // 衣柜相关API
-app.get('/api/wardrobe/:category', (req, res) => {
+app.get('/api/wardrobe/:category', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const category = req.params.category;
-  const sql = 'SELECT * FROM wardrobe_items WHERE category = ? ORDER BY sort_order ASC, created_at ASC';
+  const sql = 'SELECT * FROM wardrobe_items WHERE category = ? AND user_id = ? ORDER BY sort_order ASC, created_at ASC';
   
-  db.all(sql, [category], (err, rows) => {
+  db.all(sql, [category, userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -1479,20 +1721,21 @@ app.get('/api/wardrobe/:category', (req, res) => {
   });
 });
 
-app.post('/api/wardrobe', (req, res) => {
-  const { name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes } = req.body;
+app.post('/api/wardrobe', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  const { name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes, image_position_x, image_position_y, image_scale } = req.body;
   
   if (!name || !category) {
     return res.status(400).json({ error: 'Name and category are required' });
   }
 
   const sql = `INSERT INTO wardrobe_items 
-               (name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+               (name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes, image_position_x, image_position_y, image_scale, user_id) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   
   // 将sizes数组转换为JSON字符串
   const sizesJson = sizes && Array.isArray(sizes) ? JSON.stringify(sizes) : (sizes || null);
-  const params = [name, category, brand, platform, ownership_status || 'owned', total_price, deposit, final_payment, final_payment_date, profile_image_url, sizesJson];
+  const params = [name, category, brand, platform, ownership_status || 'owned', total_price, deposit, final_payment, final_payment_date, profile_image_url, sizesJson, image_position_x || 50, image_position_y || 50, image_scale || 100, userId];
   
   db.run(sql, params, function(err) {
     if (err) {
@@ -1506,8 +1749,9 @@ app.post('/api/wardrobe', (req, res) => {
   });
 });
 
-app.put('/api/wardrobe/:id', (req, res) => {
-  const { name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes } = req.body;
+app.put('/api/wardrobe/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  const { name, category, brand, platform, ownership_status, total_price, deposit, final_payment, final_payment_date, profile_image_url, sizes, image_position_x, image_position_y, image_scale } = req.body;
   const id = req.params.id;
   
   if (!name || !category) {
@@ -1517,14 +1761,14 @@ app.put('/api/wardrobe/:id', (req, res) => {
   const sql = `UPDATE wardrobe_items SET 
                name = ?, category = ?, brand = ?, platform = ?, ownership_status = ?, 
                total_price = ?, deposit = ?, final_payment = ?, final_payment_date = ?, 
-               profile_image_url = ?, sizes = ?
-               WHERE id = ?`;
+               profile_image_url = ?, sizes = ?, image_position_x = ?, image_position_y = ?, image_scale = ?
+               WHERE id = ? AND user_id = ?`;
   
   // 将sizes数组转换为JSON字符串
   console.log('更新wardrobe item - sizes数据:', sizes, 'type:', typeof sizes, 'isArray:', Array.isArray(sizes));
   const sizesJson = sizes && Array.isArray(sizes) ? JSON.stringify(sizes) : (sizes || null);
   console.log('转换后的sizesJson:', sizesJson);
-  const params = [name, category, brand, platform, ownership_status || 'owned', total_price, deposit, final_payment, final_payment_date, profile_image_url, sizesJson, id];
+  const params = [name, category, brand, platform, ownership_status || 'owned', total_price, deposit, final_payment, final_payment_date, profile_image_url, sizesJson, image_position_x || 50, image_position_y || 50, image_scale || 100, id, userId];
   
   db.run(sql, params, function(err) {
     if (err) {
@@ -1539,10 +1783,11 @@ app.put('/api/wardrobe/:id', (req, res) => {
   });
 });
 
-app.delete('/api/wardrobe/:id', (req, res) => {
+app.delete('/api/wardrobe/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   
-  db.run('DELETE FROM wardrobe_items WHERE id = ?', [id], function(err) {
+  db.run('DELETE FROM wardrobe_items WHERE id = ? AND user_id = ?', [id, userId], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -1555,14 +1800,15 @@ app.delete('/api/wardrobe/:id', (req, res) => {
   });
 });
 
-app.get('/api/wardrobe/search/:term', (req, res) => {
+app.get('/api/wardrobe/search/:term', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const term = req.params.term;
   const sql = `SELECT * FROM wardrobe_items 
-               WHERE name LIKE ? OR brand LIKE ? OR platform LIKE ?
+               WHERE (name LIKE ? OR brand LIKE ? OR platform LIKE ?) AND user_id = ?
                ORDER BY sort_order ASC, created_at ASC`;
   
   const searchTerm = `%${term}%`;
-  db.all(sql, [searchTerm, searchTerm, searchTerm], (err, rows) => {
+  db.all(sql, [searchTerm, searchTerm, searchTerm, userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -1572,33 +1818,34 @@ app.get('/api/wardrobe/search/:term', (req, res) => {
 });
 
 // 娃柜搜索API
-app.get('/api/dolls/search/:term', (req, res) => {
+app.get('/api/dolls/search/:term', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const term = req.params.term;
   const searchTerm = `%${term}%`;
   
   // 搜索娃头
   const headsSql = `SELECT *, 'head' as type FROM doll_heads 
-                     WHERE name LIKE ? OR company LIKE ? OR skin_tone LIKE ? 
-                     OR purchase_channel LIKE ? OR size_category LIKE ?
+                     WHERE (name LIKE ? OR company LIKE ? OR skin_tone LIKE ? 
+                     OR purchase_channel LIKE ? OR size_category LIKE ?) AND user_id = ?
                      ORDER BY sort_order ASC, created_at ASC`;
   
   // 搜索娃体
   const bodiesSql = `SELECT *, 'body' as type FROM doll_bodies 
-                      WHERE name LIKE ? OR company LIKE ? OR skin_tone LIKE ? 
-                      OR purchase_channel LIKE ? OR size_category LIKE ?
+                      WHERE (name LIKE ? OR company LIKE ? OR skin_tone LIKE ? 
+                      OR purchase_channel LIKE ? OR size_category LIKE ?) AND user_id = ?
                       ORDER BY sort_order ASC, created_at ASC`;
   
   const results = [];
   
   // 先查询娃头
-  db.all(headsSql, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm], (err, heads) => {
+  db.all(headsSql, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, userId], (err, heads) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
     
     // 再查询娃体
-    db.all(bodiesSql, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm], (err, bodies) => {
+    db.all(bodiesSql, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, userId], (err, bodies) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -1611,7 +1858,8 @@ app.get('/api/dolls/search/:term', (req, res) => {
   });
 });
 
-app.put('/api/wardrobe/:id/confirm-arrival', (req, res) => {
+app.put('/api/wardrobe/:id/confirm-arrival', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { hasArrived } = req.body;
   
@@ -1637,7 +1885,8 @@ app.put('/api/wardrobe/:id/confirm-arrival', (req, res) => {
 });
 
 // 衣柜付款状态更新端点
-app.put('/api/wardrobe/:id/payment-status', (req, res) => {
+app.put('/api/wardrobe/:id/payment-status', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   const { payment_status } = req.body;
   
@@ -1656,7 +1905,8 @@ app.put('/api/wardrobe/:id/payment-status', (req, res) => {
   });
 });
 
-app.get('/api/wardrobe/stats/brands', (req, res) => {
+app.get('/api/wardrobe/stats/brands', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const sql = `SELECT brand, COUNT(*) as count FROM wardrobe_items 
                WHERE brand IS NOT NULL AND brand != '' 
                GROUP BY brand ORDER BY count DESC`;
@@ -1670,7 +1920,8 @@ app.get('/api/wardrobe/stats/brands', (req, res) => {
   });
 });
 
-app.get('/api/wardrobe/stats/sizes', (req, res) => {
+app.get('/api/wardrobe/stats/sizes', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const sql = `SELECT sizes, COUNT(*) as count FROM wardrobe_items 
                WHERE sizes IS NOT NULL AND sizes != '' 
                GROUP BY sizes ORDER BY count DESC`;
@@ -1684,7 +1935,8 @@ app.get('/api/wardrobe/stats/sizes', (req, res) => {
   });
 });
 
-app.get('/api/wardrobe/stats/status', (req, res) => {
+app.get('/api/wardrobe/stats/status', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const sql = `SELECT ownership_status, COUNT(*) as count FROM wardrobe_items 
                GROUP BY ownership_status ORDER BY count DESC`;
   
@@ -1697,7 +1949,8 @@ app.get('/api/wardrobe/stats/status', (req, res) => {
   });
 });
 
-app.post('/api/sort/wardrobe/:category', (req, res) => {
+app.post('/api/sort/wardrobe/:category', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { sortOrder } = req.body;
   const category = req.params.category;
   
@@ -1728,7 +1981,8 @@ app.post('/api/sort/wardrobe/:category', (req, res) => {
 });
 
 // 排序API
-app.post('/api/sort/doll-heads', (req, res) => {
+app.post('/api/sort/doll-heads', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { sortOrder } = req.body;
   
   if (!Array.isArray(sortOrder)) {
@@ -1757,7 +2011,8 @@ app.post('/api/sort/doll-heads', (req, res) => {
   });
 });
 
-app.post('/api/sort/doll-bodies', (req, res) => {
+app.post('/api/sort/doll-bodies', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { sortOrder } = req.body;
   
   if (!Array.isArray(sortOrder)) {
@@ -1787,7 +2042,8 @@ app.post('/api/sort/doll-bodies', (req, res) => {
 });
 
 // 照片管理API
-app.get('/api/photos/:entityType/:entityId', (req, res) => {
+app.get('/api/photos/:entityType/:entityId', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { entityType, entityId } = req.params;
   
   const sql = 'SELECT * FROM photos WHERE entity_type = ? AND entity_id = ? ORDER BY created_at ASC';
@@ -1800,7 +2056,8 @@ app.get('/api/photos/:entityType/:entityId', (req, res) => {
   });
 });
 
-app.post('/api/photos', (req, res) => {
+app.post('/api/photos', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { entity_type, entity_id, photo_type, image_url, caption, is_cover } = req.body;
   
   if (!entity_type || !entity_id || !image_url) {
@@ -1833,7 +2090,8 @@ app.post('/api/photos', (req, res) => {
   });
 });
 
-app.put('/api/photos/:id', (req, res) => {
+app.put('/api/photos/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { entity_type, entity_id, photo_type, image_url, caption, is_cover } = req.body;
   const id = req.params.id;
   
@@ -1870,7 +2128,8 @@ app.put('/api/photos/:id', (req, res) => {
   });
 });
 
-app.delete('/api/photos/:id', (req, res) => {
+app.delete('/api/photos/:id', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const id = req.params.id;
   
   db.run('DELETE FROM photos WHERE id = ?', [id], function(err) {
@@ -1887,7 +2146,8 @@ app.delete('/api/photos/:id', (req, res) => {
 });
 
 // 综合花费统计API
-app.get('/api/stats/total-expenses', async (req, res) => {
+app.get('/api/stats/total-expenses', auth.authMiddleware, async (req, res) => {
+  const userId = req.userId;
   try {
     const stats = {
       dolls: { heads: 0, bodies: 0, total: 0 },
@@ -1956,6 +2216,7 @@ app.get('/api/stats/total-expenses', async (req, res) => {
     const wardrobeCost = await new Promise((resolve, reject) => {
       db.all(`
         SELECT 
+          category,
           CASE 
             WHEN ownership_status = 'owned' THEN 
               COALESCE(total_price, 0)
@@ -1966,13 +2227,40 @@ app.get('/api/stats/total-expenses', async (req, res) => {
       `, [], (err, rows) => {
         if (err) reject(err);
         else {
-          const total = rows.reduce((sum, row) => sum + (row.item_cost || 0), 0);
-          resolve(total);
+          const categoryTotals = {
+            body_accessories: 0,
+            eyes: 0,
+            wigs: 0,
+            headwear: 0,
+            sets: 0,
+            single_items: 0,
+            handheld: 0
+          };
+          
+          let total = 0;
+          rows.forEach(row => {
+            const cost = row.item_cost || 0;
+            total += cost;
+            if (categoryTotals.hasOwnProperty(row.category)) {
+              categoryTotals[row.category] += cost;
+            }
+          });
+          
+          resolve({ 
+            total, 
+            body_accessories: categoryTotals.body_accessories,
+            eyes: categoryTotals.eyes,
+            wigs: categoryTotals.wigs,
+            headwear: categoryTotals.headwear,
+            sets: categoryTotals.sets,
+            single_items: categoryTotals.single_items,
+            handheld: categoryTotals.handheld
+          });
         }
       });
     });
 
-    stats.wardrobe.total = wardrobeCost;
+    stats.wardrobe = wardrobeCost;
     stats.grandTotal = stats.dolls.total + stats.makeup.total + stats.wardrobe.total;
 
     // 构建分类统计
@@ -1990,7 +2278,8 @@ app.get('/api/stats/total-expenses', async (req, res) => {
 });
 
 // 月度花费趋势API
-app.get('/api/stats/monthly-trend', async (req, res) => {
+app.get('/api/stats/monthly-trend', auth.authMiddleware, async (req, res) => {
+  const userId = req.userId;
   try {
     const months = [];
     const currentDate = new Date();
@@ -2072,7 +2361,8 @@ app.get('/api/stats/monthly-trend', async (req, res) => {
 });
 
 // 图片位置更新API
-app.put('/api/doll-heads/:id/image-position', (req, res) => {
+app.put('/api/doll-heads/:id/image-position', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { image_position_x, image_position_y, image_scale } = req.body;
   const id = req.params.id;
   
@@ -2102,7 +2392,8 @@ app.put('/api/doll-heads/:id/image-position', (req, res) => {
   });
 });
 
-app.put('/api/doll-bodies/:id/image-position', (req, res) => {
+app.put('/api/doll-bodies/:id/image-position', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
   const { image_position_x, image_position_y, image_scale } = req.body;
   const id = req.params.id;
   
@@ -2122,6 +2413,38 @@ app.put('/api/doll-bodies/:id/image-position', (req, res) => {
     
     if (this.changes === 0) {
       res.status(404).json({ error: 'Doll body not found' });
+      return;
+    }
+    
+    res.json({ 
+      message: 'Image position updated successfully',
+      changes: this.changes 
+    });
+  });
+});
+
+// 衣柜物品图片位置更新API
+app.put('/api/wardrobe/:id/image-position', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  const { image_position_x, image_position_y, image_scale } = req.body;
+  const id = req.params.id;
+  
+  const sql = `UPDATE wardrobe_items SET 
+    image_position_x = ?, image_position_y = ?, image_scale = ?
+    WHERE id = ?`;
+    
+  const params = [
+    image_position_x || 50, image_position_y || 50, image_scale || 100, id
+  ];
+  
+  db.run(sql, params, function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Wardrobe item not found' });
       return;
     }
     

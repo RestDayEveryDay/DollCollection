@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import './ImageUpload.css';
+import { apiUpload, apiDelete } from '../utils/api';
 
 const ImageUpload = ({ onImageSelect, currentImage, placeholder = "点击上传图片" }) => {
   const [preview, setPreview] = useState(currentImage || null);
@@ -25,16 +26,8 @@ const ImageUpload = ({ onImageSelect, currentImage, placeholder = "点击上传�
     // 上传文件
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const response = await fetch('http://localhost:5000/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      try {
+        const result = await apiUpload('/api/upload', file);
         const fullImageUrl = `http://localhost:5000${result.imageUrl}`;
         
         // 通知父组件
@@ -43,8 +36,7 @@ const ImageUpload = ({ onImageSelect, currentImage, placeholder = "点击上传�
         }
         
         console.log('图片上传成功:', result);
-      } else {
-        const error = await response.json();
+      } catch (error) {
         alert(`上传失败: ${error.error}`);
         setPreview(currentImage || null);
       }

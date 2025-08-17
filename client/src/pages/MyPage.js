@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
+import { apiGet } from '../utils/api';
 
 // 花费统计卡片组件
 const ExpenseCard = ({ title, icon, amount, color, percentage, details }) => {
@@ -31,121 +32,70 @@ const ExpenseCard = ({ title, icon, amount, color, percentage, details }) => {
   );
 };
 
-// 统计总览卡片组件
-const OverviewCard = ({ title, value, unit, icon, color }) => {
-  return (
-    <div className="overview-card">
-      <div className="overview-icon" style={{ color }}>
-        {icon}
-      </div>
-      <div className="overview-content">
-        <div className="overview-value">{value}</div>
-        <div className="overview-label">{title}</div>
-        {unit && <div className="overview-unit">{unit}</div>}
-      </div>
-    </div>
-  );
-};
 
-// 简单的趋势图组件
-const TrendChart = ({ data }) => {
-  const maxAmount = Math.max(...data.map(d => d.total)) || 1;
-  
-  return (
-    <div className="trend-chart">
-      <div className="chart-header">
-        <h3>近期花费趋势</h3>
-      </div>
-      <div className="chart-container">
-        <div className="chart-bars">
-          {data.slice(-6).map((item, index) => (
-            <div key={index} className="chart-bar-container">
-              <div className="chart-bar">
-                <div 
-                  className="bar-fill"
-                  style={{ 
-                    height: `${(item.total / maxAmount) * 100}%`,
-                    background: 'linear-gradient(135deg, #5A4FCF 0%, #4A3FCF 100%)'
-                  }}
-                ></div>
-              </div>
-              <div className="bar-label">{item.display}</div>
-              <div className="bar-value">¥{item.total.toFixed(0)}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MyPage = ({ onNavigate }) => {
+const MyPage = ({ onNavigate, currentUser, onLogout }) => {
   const [expenseStats, setExpenseStats] = useState(null);
-  const [monthlyTrend, setMonthlyTrend] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [overviewStats, setOverviewStats] = useState({
-    totalItems: 0,
-    dollCount: 0,
-    makeupCount: 0,
-    wardrobeCount: 0
-  });
   const [paymentReminders, setPaymentReminders] = useState([]);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   useEffect(() => {
     fetchExpenseStats();
-    fetchMonthlyTrend();
-    fetchOverviewStats();
     fetchPaymentReminders();
+    setLoading(false);
   }, []);
 
   const fetchExpenseStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/stats/total-expenses');
-      const data = await response.json();
+      const data = await apiGet('/api/stats/total-expenses');
       setExpenseStats(data);
     } catch (error) {
       console.error('获取花费统计失败:', error);
     }
   };
 
-  const fetchMonthlyTrend = async () => {
+  // 处理修改用户名
+  const handleChangeUsername = async () => {
+    if (!newUsername.trim()) {
+      setUsernameError('用户名不能为空');
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/api/stats/monthly-trend');
+      const response = await fetch('http://localhost:5000/api/auth/change-username', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ newUsername: newUsername.trim() })
+      });
+
       const data = await response.json();
-      setMonthlyTrend(data);
+      
+      if (response.ok) {
+        // 更新本地存储
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
+        
+        // 关闭弹窗
+        setShowUsernameModal(false);
+        setNewUsername('');
+        setUsernameError('');
+        
+        // 刷新页面以更新用户名显示
+        window.location.reload();
+      } else {
+        setUsernameError(data.error || '修改失败');
+      }
     } catch (error) {
-      console.error('获取月度趋势失败:', error);
+      console.error('修改用户名失败:', error);
+      setUsernameError('网络错误，请重试');
     }
   };
 
-  const fetchOverviewStats = async () => {
-    try {
-      // 获取娃柜统计
-      const dollsResponse = await fetch('http://localhost:5000/api/dolls/stats');
-      const dollsData = await dollsResponse.json();
-      
-      // 获取约妆统计
-      const appointmentsResponse = await fetch('http://localhost:5000/api/makeup-appointments');
-      const appointmentsData = await appointmentsResponse.json();
-      
-      // 获取衣柜统计
-      const wardrobeResponse = await fetch('http://localhost:5000/api/wardrobe/stats/status');
-      const wardrobeData = await wardrobeResponse.json();
-      
-      const totalWardrobe = wardrobeData.reduce((sum, item) => sum + item.count, 0);
-      
-      setOverviewStats({
-        totalItems: dollsData.total.total_count + appointmentsData.length + totalWardrobe,
-        dollCount: dollsData.total.total_count || 0,
-        makeupCount: appointmentsData.length || 0,
-        wardrobeCount: totalWardrobe
-      });
-    } catch (error) {
-      console.error('获取总览统计失败:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 获取尾款提醒数据
   const fetchPaymentReminders = async () => {
@@ -153,9 +103,8 @@ const MyPage = ({ onNavigate }) => {
       const reminders = [];
       
       // 获取娃头数据
-      const dollHeadsResponse = await fetch('http://localhost:5000/api/doll-heads');
-      if (dollHeadsResponse.ok) {
-        const dollHeads = await dollHeadsResponse.json();
+      try {
+        const dollHeads = await apiGet('/api/doll-heads');
         dollHeads.forEach(head => {
           if (head.ownership_status === 'preorder' && 
               (head.payment_status || 'deposit_only') !== 'full_paid') {
@@ -169,12 +118,13 @@ const MyPage = ({ onNavigate }) => {
             });
           }
         });
+      } catch (error) {
+        console.error('获取娃头数据失败:', error);
       }
       
       // 获取娃体数据
-      const dollBodiesResponse = await fetch('http://localhost:5000/api/doll-bodies');
-      if (dollBodiesResponse.ok) {
-        const dollBodies = await dollBodiesResponse.json();
+      try {
+        const dollBodies = await apiGet('/api/doll-bodies');
         dollBodies.forEach(body => {
           if (body.ownership_status === 'preorder' && 
               (body.payment_status || 'deposit_only') !== 'full_paid') {
@@ -188,14 +138,15 @@ const MyPage = ({ onNavigate }) => {
             });
           }
         });
+      } catch (error) {
+        console.error('获取娃体数据失败:', error);
       }
       
       // 获取衣柜数据
       const categories = ['body_accessories', 'eyes', 'wigs', 'headwear', 'sets', 'single_items', 'handheld'];
       for (const category of categories) {
-        const wardrobeResponse = await fetch(`http://localhost:5000/api/wardrobe/${category}`);
-        if (wardrobeResponse.ok) {
-          const wardrobeItems = await wardrobeResponse.json();
+        try {
+          const wardrobeItems = await apiGet(`/api/wardrobe/${category}`);
           wardrobeItems.forEach(item => {
             if (item.ownership_status === 'preorder' && 
                 (item.payment_status || 'deposit_only') !== 'full_paid') {
@@ -209,6 +160,8 @@ const MyPage = ({ onNavigate }) => {
               });
             }
           });
+        } catch (error) {
+          console.error(`获取${category}数据失败:`, error);
         }
       }
       
@@ -273,49 +226,85 @@ const MyPage = ({ onNavigate }) => {
 
   return (
     <div className="page-content">
-      <div className="page-header">
-        <h1>我的收藏</h1>
-        <div className="header-subtitle">
-          收藏管理 & 花费统计
+      {/* 顶部用户信息区域 */}
+      <div className="profile-header">
+        <div className="profile-header-content">
+          <div className="profile-avatar">
+            <span className="avatar-icon">👤</span>
+          </div>
+          <div className="profile-info">
+            <div className="profile-username">
+              <span className="username-text">{currentUser?.username || localStorage.getItem('username')}</span>
+              <button 
+                className="edit-username-btn"
+                onClick={() => {
+                  setShowUsernameModal(true);
+                  setNewUsername('');
+                  setUsernameError('');
+                }}
+                title="修改用户名"
+              >
+                ✏️
+              </button>
+            </div>
+            <div className="profile-subtitle">收藏管理 & 花费统计</div>
+          </div>
+          <button 
+            className="header-logout-btn"
+            onClick={onLogout}
+          >
+            退出登录
+          </button>
         </div>
       </div>
 
-      {/* 总览统计 */}
-      <div className="overview-section">
-        <h2 className="section-title">
-          收藏概览
-        </h2>
-        <div className="overview-grid">
-          <OverviewCard
-            title="总收藏"
-            value={overviewStats.totalItems}
-            unit="件"
-            icon=""
-            color="#7c7c7c"
-          />
-          <OverviewCard
-            title="娃娃"
-            value={overviewStats.dollCount}
-            unit="个"
-            icon=""
-            color="#e91e63"
-          />
-          <OverviewCard
-            title="约妆"
-            value={overviewStats.makeupCount}
-            unit="个"
-            icon=""
-            color="#9c27b0"
-          />
-          <OverviewCard
-            title="配饰"
-            value={overviewStats.wardrobeCount}
-            unit="件"
-            icon=""
-            color="#4caf50"
-          />
+      {/* 修改用户名弹窗 */}
+      {showUsernameModal && (
+        <div className="modal-overlay" onClick={() => setShowUsernameModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>修改用户名</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowUsernameModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <input
+                type="text"
+                className="username-input"
+                placeholder="请输入新用户名"
+                value={newUsername}
+                onChange={(e) => {
+                  setNewUsername(e.target.value);
+                  setUsernameError('');
+                }}
+                onKeyPress={(e) => e.key === 'Enter' && handleChangeUsername()}
+                autoFocus
+              />
+              {usernameError && (
+                <div className="error-message">{usernameError}</div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="cancel-btn"
+                onClick={() => setShowUsernameModal(false)}
+              >
+                取消
+              </button>
+              <button 
+                className="confirm-btn"
+                onClick={handleChangeUsername}
+              >
+                确认修改
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 花费统计 */}
       {expenseStats && (
@@ -366,18 +355,17 @@ const MyPage = ({ onNavigate }) => {
               amount={expenseStats.wardrobe.total}
               color="#4caf50"
               percentage={(expenseStats.wardrobe.total / expenseStats.grandTotal) * 100}
+              details={[
+                { label: '配饰', value: expenseStats.wardrobe.body_accessories || 0 },
+                { label: '眼睛', value: expenseStats.wardrobe.eyes || 0 },
+                { label: '假发', value: expenseStats.wardrobe.wigs || 0 },
+                { label: '头饰', value: expenseStats.wardrobe.headwear || 0 },
+                { label: '套装', value: expenseStats.wardrobe.sets || 0 },
+                { label: '单品', value: expenseStats.wardrobe.single_items || 0 },
+                { label: '手持物', value: expenseStats.wardrobe.handheld || 0 }
+              ].filter(item => item.value > 0)}
             />
           </div>
-        </div>
-      )}
-
-      {/* 月度趋势 */}
-      {monthlyTrend.length > 0 && (
-        <div className="trend-section">
-          <h2 className="section-title">
-            花费趋势
-          </h2>
-          <TrendChart data={monthlyTrend} />
         </div>
       )}
 
@@ -449,29 +437,6 @@ const MyPage = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* 快速导航 */}
-      <div className="quick-nav-section">
-        <h2 className="section-title">
-          快速导航
-        </h2>
-        <div className="quick-nav-grid">
-          <div className="quick-nav-card" onClick={() => onNavigate && onNavigate('dolls')}>
-            <div className="nav-card-icon"></div>
-            <div className="nav-card-title">娃柜管理</div>
-            <div className="nav-card-desc">查看和管理你的娃娃收藏</div>
-          </div>
-          <div className="quick-nav-card" onClick={() => onNavigate && onNavigate('makeup')}>
-            <div className="nav-card-icon"></div>
-            <div className="nav-card-title">妆师工坊</div>
-            <div className="nav-card-desc">管理妆师和约妆信息</div>
-          </div>
-          <div className="quick-nav-card" onClick={() => onNavigate && onNavigate('wardrobe')}>
-            <div className="nav-card-icon"></div>
-            <div className="nav-card-title">配饰衣柜</div>
-            <div className="nav-card-desc">整理你的配饰和服装</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

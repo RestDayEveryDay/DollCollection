@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import WardrobeCategory from '../components/WardrobeCategory';
 import ImageViewer from '../components/ImageViewer';
 import './WardrobePage.css';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 
 // 计算倒计时的函数
 const calculateDaysRemaining = (finalPaymentDate) => {
@@ -446,7 +447,7 @@ const SearchResultCard = ({ item, categoryName, onImageClick, onDelete, onConfir
   );
 };
 
-const WardrobePage = () => {
+const WardrobePage = ({ currentUser }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryCounts, setCategoryCounts] = useState({});
   const [categoryPrices, setCategoryPrices] = useState({});
@@ -526,11 +527,9 @@ const WardrobePage = () => {
     const prices = {};
     for (const category of categories) {
       try {
-        const response = await fetch(`http://localhost:5000/api/wardrobe/${category.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          const ownedItems = data.filter(item => item.ownership_status === 'owned');
-          const preorderItems = data.filter(item => item.ownership_status === 'preorder');
+        const data = await apiGet(`/api/wardrobe/${category.id}`);
+        const ownedItems = data.filter(item => item.ownership_status === 'owned');
+        const preorderItems = data.filter(item => item.ownership_status === 'preorder');
           
           // 计算数量
           counts[category.id] = { 
@@ -559,10 +558,6 @@ const WardrobePage = () => {
             totalPaid: ownedTotalPrice + preorderPaidPrice,
             totalRemaining: preorderRemainingPrice
           };
-        } else {
-          counts[category.id] = { owned: 0, preorder: 0, total: 0 };
-          prices[category.id] = { ownedTotal: 0, preorderPaid: 0, preorderRemaining: 0, totalPaid: 0, totalRemaining: 0 };
-        }
       } catch (error) {
         console.error(`获取${category.name}数据失败:`, error);
         counts[category.id] = { owned: 0, preorder: 0, total: 0 };
@@ -575,15 +570,11 @@ const WardrobePage = () => {
 
   const performSearch = async (term) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/search/${encodeURIComponent(term)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data);
-      } else {
-        setSearchResults([]);
-      }
+      const data = await apiGet(`/api/wardrobe/search/${encodeURIComponent(term)}`);
+      setSearchResults(data || []);
     } catch (error) {
       console.error('搜索失败:', error);
+      setSearchResults([]);
       setSearchResults([]);
     }
   };
@@ -808,7 +799,7 @@ const WardrobePage = () => {
   return (
     <div className="page-content">
       <div className="page-header">
-        <h1>我的衣柜</h1>
+        <h1>{currentUser?.username || '我'}的衣柜</h1>
         <div className="view-mode-buttons">
           <button 
             className={`view-mode-btn ${viewMode === 'category' ? 'active' : ''}`}

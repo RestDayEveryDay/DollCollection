@@ -17,7 +17,7 @@
   margin-top: 10px;
   display: flex;
   gap: 10px;
-  z-index: 100;
+  z-index: 1000;
   background: white;
   padding: 10px;
   border-radius: 12px;
@@ -146,6 +146,8 @@
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
 }
 
 .add-form h3 {
@@ -191,6 +193,8 @@
 
 .image-upload-container {
   margin: 20px 0;
+  position: relative;
+  z-index: 1;
 }
 
 .form-label {
@@ -381,19 +385,57 @@
   border-left: 4px solid #A8D8B8;
 }
 
-.wardrobe-image {
+.wardrobe-image-container {
+  position: relative;
   width: 100%;
   height: 200px;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: 12px;
   margin-bottom: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  background-color: #f8f9fa;
 }
 
-.wardrobe-image:hover {
-  transform: scale(1.02);
+.image-position-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(90, 79, 207, 0.9);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+  z-index: 10;
 }
+
+.wardrobe-card:hover .image-position-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.image-position-btn:hover {
+  background: rgba(74, 63, 207, 0.95);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(90, 79, 207, 0.4);
+}
+
+.image-position-btn:active {
+  transform: scale(0.95);
+}
+
+.wardrobe-image {
+  width: 100%;
+  height: 100%;
+}
+
 
 .wardrobe-info {
   display: flex;
