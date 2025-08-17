@@ -1,0 +1,553 @@
+/* 页面头部选项卡样式 */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-tabs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tab-button {
+  background: rgba(90, 79, 207, 0.1);
+  color: #5A4FCF;
+  border: 2px solid rgba(168, 216, 184, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  background: rgba(90, 79, 207, 0.1);
+  border-color: rgba(168, 216, 184, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(90, 79, 207, 0.2);
+}
+
+.tab-button.active {
+  background: rgba(90, 79, 207, 0.1);
+  border-color: #5A4FCF;
+  color: #5A4FCF;
+  box-shadow: 0 4px 16px rgba(90, 79, 207, 0.2);
+  transform: translateY(-1px);
+}
+
+.header-button {
+  background: #7fb069;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(127, 176, 105, 0.2);
+}
+
+.header-button:hover {
+  background: #6ba055;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(127, 176, 105, 0.3);
+}
+
+/* 约妆区域样式 */
+.appointments-section {
+  margin-bottom: 32px;
+}
+
+.appointment-title {
+  color: #e8a024;
+}
+
+.appointments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.appointment-card {
+  background: #fff;
+  border: 2px solid #e8a024;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(232, 160, 36, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.appointment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(232, 160, 36, 0.2);
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.appointment-info {
+  flex: 1;
+}
+
+.head-name {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.head-company {
+  font-weight: normal;
+  color: #666;
+  font-size: 14px;
+}
+
+.artist-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.artist-name {
+  color: #e8a024;
+  font-weight: 500;
+}
+
+.makeup-fee {
+  background: #e8a024;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.cancel-appointment-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.2);
+}
+
+.cancel-appointment-btn:hover {
+  background: #ff5252;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+}
+
+.expected-date {
+  background: #f0f8ff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-left: 4px solid #4dabf7;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #1c7ed6;
+}
+
+.appointment-notes {
+  margin-bottom: 8px;
+}
+
+.notes-label {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 6px;
+}
+
+.notes-content {
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  text-align: left;
+  padding-left: 0;
+}
+
+.appointment-date {
+  font-size: 12px;
+  color: #868e96;
+  text-align: right;
+}
+
+/* 妆师列表样式优化 */
+.makeup-artists-container {
+  margin-top: 20px;
+}
+
+.artist-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.favorite-title {
+  color: #e91e63;
+}
+
+.title-icon {
+  font-size: 28px;
+}
+
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.artist-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.artist-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-card {
+  border-color: #e91e63;
+  box-shadow: 0 2px 8px rgba(233, 30, 99, 0.1);
+}
+
+.favorite-card:hover {
+  box-shadow: 0 4px 16px rgba(233, 30, 99, 0.2);
+}
+
+.artist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #999;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+}
+
+.artist-info {
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.artist-info p {
+  margin: 0;
+  line-height: 1.4;
+  background: #f8f9fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.artist-info p strong {
+  color: #495057;
+  font-weight: 600;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.edit-btn, .delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-btn {
+  background: #007bff;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin-bottom: 12px;
+  color: #495057;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-btn:hover {
+  color: #0056b3;
+}
+
+/* 表单样式 */
+.add-form {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-form h3 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #7fb069;
+  box-shadow: 0 0 0 3px rgba(127, 176, 105, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.add-form button[type="submit"] {
+  background: #7fb069;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(127, 176, 105, 0.2);
+}
+
+.add-form button[type="submit"]:hover {
+  background: #6ba055;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(127, 176, 105, 0.3);
+}
+
+/* 搜索相关样式 */
+.search-container {
+  margin-bottom: 24px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 50px 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  right: 45px;
+  color: #9CA3AF;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #9CA3AF;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search-btn:hover {
+  background: #6B7280;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-results-info {
+  text-align: center;
+  margin-top: 10px;
+  color: #6B7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-tabs {
+    order: 2;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .header-button {
+    order: 3;
+    align-self: center;
+  }
+  
+  .appointments-grid, .artists-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .appointment-card, .artist-card {
+    padding: 12px;
+  }
+  
+  .head-name {
+    font-size: 16px;
+  }
+  
+  .artist-info {
+    gap: 8px;
+  }
+  
+  .artist-info p {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+  
+  .tab-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,470 @@
+.makeup-history {
+  margin: 20px 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-header h4 {
+  color: #5A4FCF;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.add-history-btn {
+  background: #FFB3E6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.add-history-btn:hover {
+  background: #FF99E6;
+  transform: translateY(-1px);
+}
+
+.history-form {
+  background: rgba(240, 230, 255, 0.3);
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.history-form h5 {
+  color: #5A4FCF;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* 表单选项卡样式 */
+.form-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background: rgba(90, 79, 207, 0.1);
+  border: 2px solid rgba(90, 79, 207, 0.2);
+  color: #5A4FCF;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(90, 79, 207, 0.15);
+  border-color: rgba(90, 79, 207, 0.3);
+}
+
+.tab-btn.active {
+  background: #5A4FCF;
+  border-color: #5A4FCF;
+  color: white;
+}
+
+/* 当前妆容信息预览样式 */
+.current-makeup-info {
+  background: rgba(168, 216, 184, 0.1);
+  border: 2px solid rgba(168, 216, 184, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.current-makeup-preview h6 {
+  color: #5A4FCF;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.current-info p {
+  margin: 8px 0;
+  color: #4A5568;
+  font-size: 14px;
+}
+
+.current-info strong {
+  color: #5A4FCF;
+  font-weight: 600;
+}
+
+.current-image-preview {
+  margin-top: 15px;
+}
+
+.current-image-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(168, 216, 184, 0.3);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #5A4FCF;
+  font-size: 13px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px 15px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #4A5568;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #FFB3E6;
+  box-shadow: 0 4px 15px rgba(255, 179, 230, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.cancel-btn {
+  background: #B0B0B0;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: #999999;
+  transform: translateY(-1px);
+}
+
+.save-btn {
+  background: #FFB3E6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background: #FF99E6;
+  transform: translateY(-1px);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.history-item {
+  background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(135, 206, 235, 0.1);
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  border-color: #FFB3E6;
+  box-shadow: 0 6px 20px rgba(255, 179, 230, 0.2);
+  transform: translateY(-2px);
+}
+
+.history-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.history-info {
+  flex: 1;
+}
+
+.history-artist {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.artist-name {
+  font-weight: 600;
+  color: #5A4FCF;
+  font-size: 1.1rem;
+}
+
+.makeup-fee {
+  background: #A8D8B8;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.history-dates {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.date-info {
+  font-size: 13px;
+  color: #6B7280;
+  background: rgba(240, 248, 255, 0.8);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* .history-notes样式已移至CopyableText.css */
+
+.history-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.view-image-btn {
+  background: #87CEEB;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.view-image-btn:hover {
+  background: #77BFDB;
+}
+
+.history-actions .edit-btn {
+  background: #A8D8B8;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.history-actions .edit-btn:hover {
+  background: #98C8A8;
+}
+
+.history-actions .delete-btn {
+  background: #FFB3BA;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.history-actions .delete-btn:hover {
+  background: #FF99AA;
+}
+
+.history-image-preview {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.history-image-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
+.history-image-preview img:hover {
+  transform: scale(1.05);
+}
+
+.empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: rgba(240, 248, 255, 0.3);
+  border-radius: 15px;
+  text-align: center;
+}
+
+.empty-history .empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.6;
+}
+
+.empty-history p {
+  color: #9CA3AF;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 图片查看模态框 */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.image-modal .modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-modal .modal-content img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+}
+
+.image-modal .close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.image-modal .close-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-info {
+  padding: 20px;
+  background: white;
+}
+
+.modal-info h3 {
+  margin: 0 0 10px 0;
+  color: #5A4FCF;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modal-info p {
+  margin: 5px 0;
+  color: #4A5568;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .history-main {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .history-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .history-dates {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

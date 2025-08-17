@@ -1,0 +1,846 @@
+.wardrobe-category {
+  max-width: 100%;
+}
+
+.category-header {
+  margin-bottom: 25px;
+}
+
+.add-button-container {
+  position: relative;
+}
+
+.status-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(168, 216, 184, 0.2);
+}
+
+.status-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.status-button.owned-button {
+  background: rgba(168, 216, 184, 0.1);
+  color: #5A4FCF;
+  border: 2px solid rgba(168, 216, 184, 0.3);
+}
+
+.status-button.owned-button:hover {
+  background: rgba(168, 216, 184, 0.2);
+}
+
+/* 新的付款状态样式 */
+.status-badge-full-paid {
+  background: #fefffe;
+  color: #888;
+  border: 1px solid #f8f8f8;
+}
+
+.status-badge-warning {
+  background: #fffffe;
+  color: #999;
+  border: 1px solid #f9f9f9;
+  animation: pulse 2s infinite;
+}
+
+.status-badge-urgent {
+  background: #fffffe;
+  color: #aaa;
+  border: 1px solid #f9f9f9;
+  animation: flash 1s infinite;
+}
+
+.status-badge-overdue {
+  background: #fffffe;
+  color: #999;
+  border: 1px solid #f9f9f9;
+}
+
+/* 付款操作按钮 */
+.payment-actions {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.mark-paid-btn {
+  background: linear-gradient(135deg, #5f754f, #4a5c3a);
+  color: white;
+  border: 2px solid #5f754f;
+}
+
+.mark-paid-btn:hover {
+  background: linear-gradient(135deg, #4a5c3a, #3a4a2e);
+  transform: translateY(-2px);
+}
+
+/* 状态分解信息 */
+.status-breakdown {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes flash {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.5; }
+}
+
+.status-button.preorder-button {
+  background: rgba(255, 179, 186, 0.1);
+  color: #D946EF;
+  border: 2px solid rgba(255, 179, 186, 0.3);
+}
+
+.status-button.preorder-button:hover {
+  background: rgba(255, 179, 186, 0.2);
+  transform: translateY(-2px);
+}
+
+.status-icon {
+  font-size: 1.5rem;
+}
+
+.add-form {
+  background: rgba(168, 216, 184, 0.05);
+  border: 2px solid rgba(168, 216, 184, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.add-form h3 {
+  color: #5A4FCF;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 25px 0;
+  text-align: center;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.add-form input,
+.add-form select {
+  padding: 12px 15px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #4A5568;
+  transition: all 0.3s ease;
+}
+
+.add-form input:focus,
+.add-form select:focus {
+  outline: none;
+  border-color: #A8D8B8;
+  box-shadow: 0 4px 15px rgba(168, 216, 184, 0.2);
+}
+
+.preorder-fields {
+  background: rgba(255, 179, 186, 0.05);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 179, 186, 0.2);
+  margin-bottom: 15px;
+}
+
+.image-upload-container {
+  margin: 20px 0;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #5A4FCF;
+  font-size: 14px;
+}
+
+.sizes-selector {
+  margin: 20px 0;
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.size-option {
+  padding: 8px 16px;
+  border: 2px solid rgba(168, 216, 184, 0.3);
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #6B7280;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  text-align: center;
+}
+
+.size-option:hover {
+  border-color: #A8D8B8;
+  transform: translateY(-1px);
+}
+
+.size-option.selected {
+  background: #A8D8B8;
+  color: white;
+  border-color: #A8D8B8;
+  box-shadow: 0 4px 12px rgba(168, 216, 184, 0.3);
+}
+
+.add-form button[type="submit"] {
+  width: 100%;
+  background: #A8D8B8;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.add-form button[type="submit"]:hover {
+  background: #98C8A8;
+  transform: translateY(-1px);
+}
+
+.wardrobe-items {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.items-section {
+  width: 100%;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(168, 216, 184, 0.2);
+}
+
+.title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  background: rgba(168, 216, 184, 0.1);
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 216, 184, 0.2);
+}
+
+.price-label {
+  color: #6B7280;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.price-value {
+  font-weight: 700;
+  color: #5A4FCF;
+}
+
+.price-value.paid {
+  color: #10B981;
+}
+
+.price-value.remaining {
+  color: #F59E0B;
+}
+
+.price-separator {
+  color: #9CA3AF;
+  font-weight: 300;
+}
+
+.section-title.owned-title {
+  color: #5A4FCF;
+}
+
+.section-title.preorder-title {
+  color: #D946EF;
+}
+
+.title-icon {
+  font-size: 1.5rem;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.wardrobe-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(135, 206, 235, 0.1);
+  transition: all 0.3s ease;
+  cursor: grab;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.wardrobe-card.owned {
+  background: #e2f9ef !important;
+}
+
+.wardrobe-card.preorder {
+  background: #f9e2ef !important;
+}
+
+.wardrobe-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(135, 206, 235, 0.2);
+  border-color: rgba(168, 216, 184, 0.3);
+}
+
+.wardrobe-card:active {
+  cursor: grabbing;
+}
+
+.wardrobe-card.dragging {
+  transform: rotate(3deg) scale(1.05);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+}
+
+.wardrobe-card.preorder {
+  border-left: 4px solid #D946EF;
+}
+
+.wardrobe-card.owned {
+  border-left: 4px solid #A8D8B8;
+}
+
+.wardrobe-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wardrobe-image:hover {
+  transform: scale(1.02);
+}
+
+.wardrobe-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wardrobe-info h3 {
+  color: #5A4FCF;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.wardrobe-info p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.sizes-display {
+  margin: 8px 0;
+}
+
+.sizes-display strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #5A4FCF;
+  font-size: 14px;
+}
+
+.size-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.size-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(168, 216, 184, 0.2);
+  color: #5A4FCF;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(168, 216, 184, 0.3);
+}
+
+.price-info {
+  background: rgba(168, 216, 184, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  margin: 5px 0;
+}
+
+.preorder-price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.wardrobe-card.owned .status-badge {
+  background: rgba(168, 216, 184, 0.2);
+  color: #5A4FCF;
+}
+
+.wardrobe-card.preorder .status-badge {
+  background: rgba(255, 179, 186, 0.2);
+  color: #D946EF;
+}
+
+.countdown-info {
+  background: rgba(255, 179, 186, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 179, 186, 0.2);
+  margin: 8px 0;
+}
+
+.payment-date {
+  font-size: 12px;
+  color: #6B7280;
+  margin: 0 0 5px 0;
+}
+
+.countdown {
+  font-weight: 600;
+  text-align: center;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.countdown.urgent {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.countdown.warning {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.countdown .today {
+  color: #DC2626;
+  font-weight: 700;
+  animation: pulse 1s infinite;
+}
+
+.countdown .overdue {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+/* 到达确认按钮样式 */
+.arrival-confirm {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.arrival-confirm.overdue-confirmed {
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+.overdue-confirmed .overdue-notice span {
+  color: #F59E0B;
+}
+
+.overdue-notice {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.overdue-notice span {
+  color: #EF4444;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.confirm-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.confirm-question {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.confirm-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+}
+
+.yes-btn {
+  background: #10B981;
+  color: white;
+}
+
+.yes-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.no-btn {
+  background: #EF4444;
+  color: white;
+}
+
+.no-btn:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(168, 216, 184, 0.2);
+}
+
+.edit-btn, .delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.edit-btn {
+  background: #87CEEB;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #77BFDB;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background: #FFB3BA;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #FF99AA;
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: rgba(240, 248, 255, 0.3);
+  border-radius: 20px;
+  text-align: center;
+  border: 2px dashed rgba(168, 216, 184, 0.3);
+}
+
+.empty-state .empty-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  color: #5A4FCF;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.empty-state p {
+  color: #9CA3AF;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 搜索框样式 */
+.search-container {
+  margin: 20px 0 30px 0;
+}
+
+.search-input-wrapper {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+  padding: 15px 50px 15px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  font-size: 16px;
+  background: #ffffff;
+  color: #4A5568;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #A8D8B8;
+  box-shadow: 0 6px 20px rgba(168, 216, 184, 0.2);
+  transform: translateY(-2px);
+}
+
+.search-input::placeholder {
+  color: #9CA3AF;
+  font-style: italic;
+}
+
+.search-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #9CA3AF;
+  pointer-events: none;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #9CA3AF;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.clear-search-btn:hover {
+  background: #6B7280;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-results-info {
+  text-align: center;
+  margin-top: 10px;
+  color: #6B7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #5A4FCF;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.link-btn:hover {
+  color: #4A3FCF;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .status-options {
+    position: static;
+    margin-top: 15px;
+    justify-content: center;
+  }
+  
+  .wardrobe-card {
+    padding: 15px;
+  }
+  
+  .add-form {
+    padding: 20px;
+  }
+  
+  /* 确认按钮响应式 */
+  .confirm-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .confirm-question {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+  
+  .confirm-btn {
+    min-width: 80px;
+  }
+  
+  /* 价格统计响应式 */
+  .section-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .price-summary {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .price-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wardrobe-image {
+    height: 150px;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+  }
+  
+  .countdown-info {
+    padding: 8px;
+  }
+  
+  .status-options {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .status-button {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
