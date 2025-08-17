@@ -1,6 +1,7 @@
 // API工具函数 - 自动添加认证token
 
-const API_BASE_URL = 'http://localhost:5000';
+// 使用环境变量配置API地址，如果没有设置则使用默认值
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // 带认证的fetch函数
 export const authFetch = async (url, options = {}) => {
