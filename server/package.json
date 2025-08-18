@@ -4,7 +4,8 @@
   "description": "Server for doll collection app",
   "main": "index.js",
   "scripts": {
-    "start": "node init-db.js && node index-render.js",
+    "start": "node simple-server.js",
+    "start:full": "node init-db.js && node index-render.js",
     "start:original": "node index.js",
     "init-db": "node init-db.js",
     "dev": "nodemon index.js"
