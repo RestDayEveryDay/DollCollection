@@ -2,10 +2,15 @@
   "buildCommand": "npm run build",
   "outputDirectory": "client/build",
   "framework": "create-react-app",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://your-backend-url.com/api/$1"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",
