@@ -4,7 +4,8 @@
   "description": "Server for doll collection app",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index-render.js",
+    "start:original": "node index.js",
     "dev": "nodemon index.js"
   },
   "dependencies": {
