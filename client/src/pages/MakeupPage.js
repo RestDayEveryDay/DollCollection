@@ -205,13 +205,7 @@ const MakeupPage = ({ currentUser }) => {
       }));
 
       try {
-        await fetch('http://localhost:5000/api/sort/makeup-artists', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sortOrder }),
-        });
+        await apiPost('/api/sort/makeup-artists', { sortOrder });
       } catch (error) {
         console.error('更新收藏妆师排序失败:', error);
       }
@@ -242,13 +236,7 @@ const MakeupPage = ({ currentUser }) => {
       }));
 
       try {
-        await fetch('http://localhost:5000/api/sort/makeup-artists', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sortOrder }),
-        });
+        await apiPost('/api/sort/makeup-artists', { sortOrder });
       } catch (error) {
         console.error('更新普通妆师排序失败:', error);
       }
@@ -258,31 +246,18 @@ const MakeupPage = ({ currentUser }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = editingArtist 
-        ? `http://localhost:5000/api/makeup-artists/${editingArtist.id}`
-        : 'http://localhost:5000/api/makeup-artists';
-      
-      const method = editingArtist ? 'PUT' : 'POST';
+      console.log('前端发送数据:', { formData });
 
-      console.log('前端发送数据:', { method, url, formData });
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      
-      if (response.ok) {
-        fetchMakeupArtists();
-        setShowAddForm(false);
-        setEditingArtist(null);
-        resetForm();
+      if (editingArtist) {
+        await apiPut(`/api/makeup-artists/${editingArtist.id}`, formData);
       } else {
-        const errorData = await response.json();
-        console.error('服务器错误响应:', errorData);
+        await apiPost('/api/makeup-artists', formData);
       }
+      
+      fetchMakeupArtists();
+      setShowAddForm(false);
+      setEditingArtist(null);
+      resetForm();
     } catch (error) {
       console.error(editingArtist ? '更新妆师失败:' : '添加妆师失败:', error);
     }
@@ -304,9 +279,7 @@ const MakeupPage = ({ currentUser }) => {
   const deleteMakeupArtist = async (id) => {
     if (window.confirm('确定要删除这个妆师吗？')) {
       try {
-        await fetch(`http://localhost:5000/api/makeup-artists/${id}`, {
-          method: 'DELETE'
-        });
+        await apiDelete(`/api/makeup-artists/${id}`);
         fetchMakeupArtists();
       } catch (error) {
         console.error('删除妆师失败:', error);
@@ -358,16 +331,8 @@ const MakeupPage = ({ currentUser }) => {
   const toggleFavorite = async (artist) => {
     try {
       const updatedArtist = { ...artist, is_favorite: !artist.is_favorite };
-      const response = await fetch(`http://localhost:5000/api/makeup-artists/${artist.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedArtist),
-      });
-      if (response.ok) {
-        fetchMakeupArtists();
-      }
+      await apiPut(`/api/makeup-artists/${artist.id}`, updatedArtist);
+      fetchMakeupArtists();
     } catch (error) {
       console.error('更新妆师收藏状态失败:', error);
     }
@@ -377,12 +342,8 @@ const MakeupPage = ({ currentUser }) => {
     if (!window.confirm('确定要取消这个约妆吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-appointment/${headId}`, {
-        method: 'DELETE'
-      });
-      if (response.ok) {
-        fetchAppointments(); // 刷新约妆列表
-      }
+      await apiDelete(`/api/makeup-appointment/${headId}`);
+      fetchAppointments(); // 刷新约妆列表
     } catch (error) {
       console.error('取消约妆失败:', error);
     }
@@ -391,27 +352,14 @@ const MakeupPage = ({ currentUser }) => {
   // 从约妆记录创建妆师卡片
   const createArtistFromAppointment = async (appointmentId, artistName) => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists/create-from-appointment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ appointment_id: appointmentId }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        
-        if (result.existed) {
-          alert(`妆师 "${artistName}" 已存在妆师档案中！`);
-        } else if (result.created) {
-          alert(`成功为 "${artistName}" 创建妆师卡片！`);
-          fetchMakeupArtists(); // 刷新妆师列表
-          setActiveTab('artists'); // 切换到妆师列表标签
-        }
-      } else {
-        const error = await response.json();
-        alert(`创建失败: ${error.error}`);
+      const result = await apiPost('/api/makeup-artists/create-from-appointment', { appointment_id: appointmentId });
+      
+      if (result.existed) {
+        alert(`妆师 "${artistName}" 已存在妆师档案中！`);
+      } else if (result.created) {
+        alert(`成功为 "${artistName}" 创建妆师卡片！`);
+        fetchMakeupArtists(); // 刷新妆师列表
+        setActiveTab('artists'); // 切换到妆师列表标签
       }
     } catch (error) {
       console.error('创建妆师卡片失败:', error);

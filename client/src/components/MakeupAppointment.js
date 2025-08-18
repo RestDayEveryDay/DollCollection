@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiDelete } from '../utils/api';
 import CopyableText from './CopyableText';
 import './MakeupAppointment.css';
 
@@ -24,11 +25,8 @@ const MakeupAppointment = ({ headId, onStatusChange }) => {
 
   const fetchAppointment = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-appointment/${headId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setAppointment(data);
-      }
+      const data = await apiGet(`/api/makeup-appointment/${headId}`);
+      setAppointment(data);
     } catch (error) {
       console.error('获取约妆信息失败:', error);
     }
@@ -36,8 +34,7 @@ const MakeupAppointment = ({ headId, onStatusChange }) => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
+      const data = await apiGet('/api/makeup-artists');
       setMakeupArtists(data);
     } catch (error) {
       console.error('获取妆师列表失败:', error);
@@ -73,18 +70,11 @@ const MakeupAppointment = ({ headId, onStatusChange }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-appointment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.ok) {
-        fetchAppointment();
-        setShowSetForm(false);
-        resetForm();
-        if (onStatusChange) onStatusChange();
-      }
+      await apiPost('/api/makeup-appointment', submitData);
+      fetchAppointment();
+      setShowSetForm(false);
+      resetForm();
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('设置约妆失败:', error);
     }
@@ -94,14 +84,9 @@ const MakeupAppointment = ({ headId, onStatusChange }) => {
     if (!window.confirm('确定要取消约妆吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-appointment/${headId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setAppointment(null);
-        if (onStatusChange) onStatusChange();
-      }
+      await apiDelete(`/api/makeup-appointment/${headId}`);
+      setAppointment(null);
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('取消约妆失败:', error);
     }

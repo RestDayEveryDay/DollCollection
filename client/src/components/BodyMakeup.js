@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 import ImageUpload from './ImageUpload';
 import './BodyMakeup.css';
 
@@ -24,13 +25,8 @@ const BodyMakeup = ({ bodyId, onStatusChange }) => {
 
   const fetchBodyMakeup = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/body-makeup/${bodyId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setBodyMakeup(data);
-      } else {
-        setBodyMakeup(null);
-      }
+      const data = await apiGet(`/api/body-makeup/${bodyId}`);
+      setBodyMakeup(data);
     } catch (error) {
       console.error('获取体妆信息失败:', error);
       setBodyMakeup(null);
@@ -39,8 +35,7 @@ const BodyMakeup = ({ bodyId, onStatusChange }) => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
+      const data = await apiGet('/api/makeup-artists');
       setMakeupArtists(data);
     } catch (error) {
       console.error('获取妆师列表失败:', error);
@@ -76,24 +71,16 @@ const BodyMakeup = ({ bodyId, onStatusChange }) => {
     };
 
     try {
-      const url = bodyMakeup 
-        ? `http://localhost:5000/api/body-makeup/${bodyId}`
-        : 'http://localhost:5000/api/body-makeup';
-      
-      const method = bodyMakeup ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.ok) {
-        fetchBodyMakeup();
-        setShowSetForm(false);
-        resetForm();
-        if (onStatusChange) onStatusChange();
+      if (bodyMakeup) {
+        await apiPut(`/api/body-makeup/${bodyId}`, submitData);
+      } else {
+        await apiPost('/api/body-makeup', submitData);
       }
+
+      fetchBodyMakeup();
+      setShowSetForm(false);
+      resetForm();
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('保存体妆信息失败:', error);
     }
@@ -116,14 +103,9 @@ const BodyMakeup = ({ bodyId, onStatusChange }) => {
     if (!window.confirm('确定要清除体妆信息吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/body-makeup/${bodyId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setBodyMakeup(null);
-        if (onStatusChange) onStatusChange();
-      }
+      await apiDelete(`/api/body-makeup/${bodyId}`);
+      setBodyMakeup(null);
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('清除体妆信息失败:', error);
     }

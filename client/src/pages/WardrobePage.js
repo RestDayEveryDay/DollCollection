@@ -590,9 +590,7 @@ const WardrobePage = ({ currentUser }) => {
   const handleDeleteItem = async (id) => {
     if (window.confirm('确定要删除这个配件吗？')) {
       try {
-        await fetch(`http://localhost:5000/api/wardrobe/${id}`, {
-          method: 'DELETE'
-        });
+        await apiDelete(`/api/wardrobe/${id}`);
         // 重新获取数据
         fetchAllWardrobeItems();
         fetchCategoryCounts();
@@ -604,23 +602,14 @@ const WardrobePage = ({ currentUser }) => {
 
   const handleConfirmArrival = async (id, hasArrived) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/${id}/confirm-arrival`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ hasArrived }),
-      });
-
-      if (response.ok) {
-        // 重新获取数据
-        fetchAllWardrobeItems();
-        fetchCategoryCounts();
-        if (hasArrived) {
-          alert('配件状态已更新为已到家！');
-        } else {
-          alert('配件已标记为逾期状态');
-        }
+      await apiPut(`/api/wardrobe/${id}/confirm-arrival`, { hasArrived });
+      // 重新获取数据
+      fetchAllWardrobeItems();
+      fetchCategoryCounts();
+      if (hasArrived) {
+        alert('配件状态已更新为已到家！');
+      } else {
+        alert('配件已标记为逾期状态');
       }
     } catch (error) {
       console.error('确认到达状态失败:', error);
@@ -630,20 +619,11 @@ const WardrobePage = ({ currentUser }) => {
 
   const handlePaymentStatusChange = async (id, newPaymentStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/${id}/payment-status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ payment_status: newPaymentStatus }),
-      });
-
-      if (response.ok) {
-        fetchAllWardrobeItems();
-        fetchCategoryCounts();
-        if (newPaymentStatus === 'full_paid') {
-          alert('已标记为已付尾款！');
-        }
+      await apiPut(`/api/wardrobe/${id}/payment-status`, { payment_status: newPaymentStatus });
+      fetchAllWardrobeItems();
+      fetchCategoryCounts();
+      if (newPaymentStatus === 'full_paid') {
+        alert('已标记为已付尾款！');
       }
     } catch (error) {
       console.error('更新付款状态失败:', error);
@@ -715,11 +695,8 @@ const WardrobePage = ({ currentUser }) => {
 
   const fetchBrandData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/wardrobe/stats/brands');
-      if (response.ok) {
-        const data = await response.json();
-        setBrandData(data);
-      }
+      const data = await apiGet('/api/wardrobe/stats/brands');
+      setBrandData(data);
     } catch (error) {
       console.error('获取品牌数据失败:', error);
     }
@@ -727,11 +704,8 @@ const WardrobePage = ({ currentUser }) => {
 
   const fetchSizeData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/wardrobe/stats/sizes');
-      if (response.ok) {
-        const data = await response.json();
-        setSizeData(data);
-      }
+      const data = await apiGet('/api/wardrobe/stats/sizes');
+      setSizeData(data);
     } catch (error) {
       console.error('获取尺寸数据失败:', error);
     }
@@ -739,11 +713,8 @@ const WardrobePage = ({ currentUser }) => {
 
   const fetchStatusData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/wardrobe/stats/status');
-      if (response.ok) {
-        const data = await response.json();
-        setStatusData(data);
-      }
+      const data = await apiGet('/api/wardrobe/stats/status');
+      setStatusData(data);
     } catch (error) {
       console.error('获取状态数据失败:', error);
     }
@@ -754,10 +725,11 @@ const WardrobePage = ({ currentUser }) => {
       const allItems = [];
       // 获取每个分类的数据并合并
       for (const category of categories) {
-        const response = await fetch(`http://localhost:5000/api/wardrobe/${category.id}`);
-        if (response.ok) {
-          const data = await response.json();
+        try {
+          const data = await apiGet(`/api/wardrobe/${category.id}`);
           allItems.push(...data);
+        } catch (error) {
+          console.error(`获取${category.name}数据失败:`, error);
         }
       }
       setAllWardrobeItems(allItems);

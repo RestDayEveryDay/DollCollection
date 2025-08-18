@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet } from '../utils/api';
 import MakeupHistory from './MakeupHistory';
 import CurrentMakeup from './CurrentMakeup';
 import MakeupAppointment from './MakeupAppointment';
@@ -23,8 +24,7 @@ const MakeupBook = ({ headId }) => {
 
   const fetchHistoryRecords = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-history/${headId}`);
-      const data = await response.json();
+      const data = await apiGet(`/api/makeup-history/${headId}`);
       setHistoryRecords(data);
       // 默认显示最新的历史记录
       setCurrentHistoryIndex(0);
@@ -36,17 +36,21 @@ const MakeupBook = ({ headId }) => {
   const determineCurrentStatus = async () => {
     try {
       // 检查当前妆容
-      const currentResponse = await fetch(`http://localhost:5000/api/current-makeup/${headId}`);
-      if (currentResponse.ok) {
+      try {
+        await apiGet(`/api/current-makeup/${headId}`);
         setCurrentMakeupStatus('current');
         return;
+      } catch (currentError) {
+        // 继续检查约妆状态
       }
 
       // 检查约妆状态
-      const appointmentResponse = await fetch(`http://localhost:5000/api/makeup-appointment/${headId}`);
-      if (appointmentResponse.ok) {
+      try {
+        await apiGet(`/api/makeup-appointment/${headId}`);
         setCurrentMakeupStatus('appointment');
         return;
+      } catch (appointmentError) {
+        // 继续到默认状态
       }
 
       // 默认为未约妆状态

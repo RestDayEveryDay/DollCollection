@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
-import { apiGet } from '../utils/api';
+import { apiGet, apiPut } from '../utils/api';
 
 // 花费统计卡片组件
 const ExpenseCard = ({ title, icon, amount, color, percentage, details }) => {
@@ -64,35 +64,24 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/change-username', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ newUsername: newUsername.trim() })
+      const data = await apiPut('/api/auth/change-username', { 
+        newUsername: newUsername.trim() 
       });
-
-      const data = await response.json();
       
-      if (response.ok) {
-        // 更新本地存储
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.username);
-        
-        // 关闭弹窗
-        setShowUsernameModal(false);
-        setNewUsername('');
-        setUsernameError('');
-        
-        // 刷新页面以更新用户名显示
-        window.location.reload();
-      } else {
-        setUsernameError(data.error || '修改失败');
-      }
+      // 更新本地存储
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      
+      // 关闭弹窗
+      setShowUsernameModal(false);
+      setNewUsername('');
+      setUsernameError('');
+      
+      // 刷新页面以更新用户名显示
+      window.location.reload();
     } catch (error) {
       console.error('修改用户名失败:', error);
-      setUsernameError('网络错误，请重试');
+      setUsernameError(error.message || '网络错误，请重试');
     }
   };
 

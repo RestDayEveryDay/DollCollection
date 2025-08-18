@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 import ImageUpload from './ImageUpload';
 import './PhotoGallery.css';
 
@@ -14,8 +15,7 @@ const PhotoGallery = ({ entityType, entityId, onCoverChange }) => {
 
   const fetchPhotos = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/photos/${entityType}/${entityId}`);
-      const data = await response.json();
+      const data = await apiGet(`/api/photos/${entityType}/${entityId}`);
       setPhotos(data);
     } catch (error) {
       console.error('获取照片失败:', error);
@@ -26,26 +26,18 @@ const PhotoGallery = ({ entityType, entityId, onCoverChange }) => {
     if (!imageUrl) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/photos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          entity_type: entityType,
-          entity_id: entityId,
-          photo_type: 'album',
-          image_url: imageUrl,
-          caption: photoCaption,
-          is_cover: false
-        }),
+      await apiPost('/api/photos', {
+        entity_type: entityType,
+        entity_id: entityId,
+        photo_type: 'album',
+        image_url: imageUrl,
+        caption: photoCaption,
+        is_cover: false
       });
 
-      if (response.ok) {
-        fetchPhotos();
-        setShowAddPhoto(false);
-        setPhotoCaption('');
-      }
+      fetchPhotos();
+      setShowAddPhoto(false);
+      setPhotoCaption('');
     } catch (error) {
       console.error('添加照片失败:', error);
     }
@@ -53,23 +45,15 @@ const PhotoGallery = ({ entityType, entityId, onCoverChange }) => {
 
   const handleSetCover = async (photoId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/photos/${photoId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          caption: photos.find(p => p.id === photoId)?.caption || '',
-          is_cover: true
-        }),
+      await apiPut(`/api/photos/${photoId}`, {
+        caption: photos.find(p => p.id === photoId)?.caption || '',
+        is_cover: true
       });
 
-      if (response.ok) {
-        fetchPhotos();
-        if (onCoverChange) {
-          const photo = photos.find(p => p.id === photoId);
-          onCoverChange(photo.image_url);
-        }
+      fetchPhotos();
+      if (onCoverChange) {
+        const photo = photos.find(p => p.id === photoId);
+        onCoverChange(photo.image_url);
       }
     } catch (error) {
       console.error('设置封面失败:', error);
@@ -80,13 +64,8 @@ const PhotoGallery = ({ entityType, entityId, onCoverChange }) => {
     if (!window.confirm('确定要删除这张照片吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/photos/${photoId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        fetchPhotos();
-      }
+      await apiDelete(`/api/photos/${photoId}`);
+      fetchPhotos();
     } catch (error) {
       console.error('删除照片失败:', error);
     }

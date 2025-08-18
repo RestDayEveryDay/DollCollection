@@ -3,7 +3,7 @@ import ImageUpload from './ImageUpload';
 import ImageViewer from './ImageViewer';
 import PositionableImage from './PositionableImage';
 import ImagePositionEditor from './ImagePositionEditor';
-import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
+import { apiGet, apiPost, apiPut, apiDelete, authFetch } from '../utils/api';
 import {
   DndContext, 
   closestCenter,
@@ -361,12 +361,9 @@ const WardrobeCategory = ({ category, categoryName }) => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/${category}`);
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data);
-        setFilteredItems(data); // 初始化过滤数据
-      }
+      const data = await apiGet(`/api/wardrobe/${category}`);
+      setItems(data);
+      setFilteredItems(data); // 初始化过滤数据
     } catch (error) {
       console.error('获取服饰数据失败:', error);
     }
@@ -390,13 +387,7 @@ const WardrobeCategory = ({ category, categoryName }) => {
       }));
 
       try {
-        await fetch(`http://localhost:5000/api/sort/wardrobe/${category}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sortOrder }),
-        });
+        await apiPost(`/api/sort/wardrobe/${category}`, { sortOrder });
       } catch (error) {
         console.error('更新排序失败:', error);
       }
@@ -497,9 +488,7 @@ const WardrobeCategory = ({ category, categoryName }) => {
   const handleDelete = async (id) => {
     if (window.confirm('确定要删除这个服饰吗？')) {
       try {
-        await fetch(`http://localhost:5000/api/wardrobe/${id}`, {
-          method: 'DELETE'
-        });
+        await apiDelete(`/api/wardrobe/${id}`);
         fetchItems();
       } catch (error) {
         console.error('删除服饰失败:', error);
@@ -509,11 +498,8 @@ const WardrobeCategory = ({ category, categoryName }) => {
 
   const handleConfirmArrival = async (id, hasArrived) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/${id}/confirm-arrival`, {
+      const response = await authFetch(`/api/wardrobe/${id}/confirm-arrival`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ hasArrived }),
       });
 
@@ -533,11 +519,8 @@ const WardrobeCategory = ({ category, categoryName }) => {
 
   const handlePaymentStatusChange = async (id, newPaymentStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/wardrobe/${id}/payment-status`, {
+      const response = await authFetch(`/api/wardrobe/${id}/payment-status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ payment_status: newPaymentStatus }),
       });
 
@@ -574,11 +557,8 @@ const WardrobeCategory = ({ category, categoryName }) => {
   const handleImagePositionUpdate = async (newPosition) => {
     if (editingItem) {
       try {
-        const response = await fetch(`http://localhost:5000/api/wardrobe/${editingItem.id}/image-position`, {
+        const response = await authFetch(`/api/wardrobe/${editingItem.id}/image-position`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(newPosition),
         });
 
@@ -623,11 +603,8 @@ const WardrobeCategory = ({ category, categoryName }) => {
   const handleSaveImagePosition = async (newPosition) => {
     if (editingImagePosition) {
       try {
-        const response = await fetch(`http://localhost:5000/api/wardrobe/${editingImagePosition.id}/image-position`, {
+        const response = await authFetch(`/api/wardrobe/${editingImagePosition.id}/image-position`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(newPosition),
         });
 

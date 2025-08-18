@@ -650,13 +650,7 @@ const DollsPage = ({ currentUser }) => {
       }));
 
       try {
-        await fetch('http://localhost:5000/api/sort/doll-heads', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sortOrder }),
-        });
+        await apiPost('/api/sort/doll-heads', { sortOrder });
       } catch (error) {
         console.error('更新娃头排序失败:', error);
         // 如果更新失败，可以选择重新获取数据或显示错误
@@ -682,13 +676,7 @@ const DollsPage = ({ currentUser }) => {
       }));
 
       try {
-        await fetch('http://localhost:5000/api/sort/doll-bodies', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sortOrder }),
-        });
+        await apiPost('/api/sort/doll-bodies', { sortOrder });
       } catch (error) {
         console.error('更新娃体排序失败:', error);
       }
@@ -723,53 +711,34 @@ const DollsPage = ({ currentUser }) => {
   const handleHeadSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = editingHead 
-        ? `http://localhost:5000/api/doll-heads/${editingHead.id}`
-        : 'http://localhost:5000/api/doll-heads';
-      
-      const method = editingHead ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(headFormData),
-      });
-      
-      if (response.ok) {
-        if (!editingHead) {
-          // 只有在创建新娃头时才添加到相册
-          const result = await response.json();
-          const newHeadId = result.id;
+      let result;
+      if (editingHead) {
+        result = await apiPut(`/api/doll-heads/${editingHead.id}`, headFormData);
+      } else {
+        result = await apiPost('/api/doll-heads', headFormData);
+        const newHeadId = result.id;
           
           // 如果有素头图片，自动添加到相册并设为封面
           if (headFormData.profile_image_url) {
             try {
-              await fetch('http://localhost:5000/api/photos', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  entity_type: 'head',
-                  entity_id: newHeadId,
-                  photo_type: 'profile',
-                  image_url: headFormData.profile_image_url,
-                  caption: '官方图片',
-                  is_cover: true
-                }),
+              await apiPost('/api/photos', {
+                entity_type: 'head',
+                entity_id: newHeadId,
+                photo_type: 'profile',
+                image_url: headFormData.profile_image_url,
+                caption: '官方图片',
+                is_cover: true
               });
             } catch (error) {
               console.error('添加官方图片到相册失败:', error);
             }
-          }
         }
-        
-        fetchDollHeads();
-        fetchDollStats();
-        setShowAddForm(null);
-        setEditingHead(null);
+      }
+      
+      fetchDollHeads();
+      fetchDollStats();
+      setShowAddForm(null);
+      setEditingHead(null);
         setHeadFormData({
           name: '',
           company: '',
@@ -791,7 +760,6 @@ const DollsPage = ({ currentUser }) => {
           image_position_y: 50,
           image_scale: 100
         });
-      }
     } catch (error) {
       console.error('添加娃头失败:', error);
     }
@@ -800,53 +768,34 @@ const DollsPage = ({ currentUser }) => {
   const handleBodySubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = editingBody 
-        ? `http://localhost:5000/api/doll-bodies/${editingBody.id}`
-        : 'http://localhost:5000/api/doll-bodies';
-      
-      const method = editingBody ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bodyFormData),
-      });
-      
-      if (response.ok) {
-        if (!editingBody) {
-          // 只有在创建新娃体时才添加到相册
-          const result = await response.json();
-          const newBodyId = result.id;
+      let result;
+      if (editingBody) {
+        result = await apiPut(`/api/doll-bodies/${editingBody.id}`, bodyFormData);
+      } else {
+        result = await apiPost('/api/doll-bodies', bodyFormData);
+        const newBodyId = result.id;
           
           // 如果有素体图片，自动添加到相册并设为封面
           if (bodyFormData.profile_image_url) {
             try {
-              await fetch('http://localhost:5000/api/photos', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  entity_type: 'body',
-                  entity_id: newBodyId,
-                  photo_type: 'profile',
-                  image_url: bodyFormData.profile_image_url,
-                  caption: '官方图片',
-                  is_cover: true
-                }),
+              await apiPost('/api/photos', {
+                entity_type: 'body',
+                entity_id: newBodyId,
+                photo_type: 'profile',
+                image_url: bodyFormData.profile_image_url,
+                caption: '官方图片',
+                is_cover: true
               });
             } catch (error) {
               console.error('添加官方图片到相册失败:', error);
             }
-          }
         }
-        
-        fetchDollBodies();
-        fetchDollStats();
-        setShowAddForm(null);
-        setEditingBody(null);
+      }
+      
+      fetchDollBodies();
+      fetchDollStats();
+      setShowAddForm(null);
+      setEditingBody(null);
         setBodyFormData({
           name: '',
           company: '',
@@ -870,7 +819,6 @@ const DollsPage = ({ currentUser }) => {
           image_position_y: 50,
           image_scale: 100
         });
-      }
     } catch (error) {
       console.error('添加娃体失败:', error);
     }
@@ -879,9 +827,7 @@ const DollsPage = ({ currentUser }) => {
   const deleteDollHead = async (id) => {
     if (window.confirm('确定要删除这个娃头吗？')) {
       try {
-        await fetch(`http://localhost:5000/api/doll-heads/${id}`, {
-          method: 'DELETE'
-        });
+        await apiDelete(`/api/doll-heads/${id}`);
         fetchDollHeads();
         fetchDollStats();
       } catch (error) {
@@ -893,9 +839,7 @@ const DollsPage = ({ currentUser }) => {
   const deleteDollBody = async (id) => {
     if (window.confirm('确定要删除这个娃体吗？')) {
       try {
-        await fetch(`http://localhost:5000/api/doll-bodies/${id}`, {
-          method: 'DELETE'
-        });
+        await apiDelete(`/api/doll-bodies/${id}`);
         fetchDollBodies();
         fetchDollStats();
       } catch (error) {
@@ -907,24 +851,15 @@ const DollsPage = ({ currentUser }) => {
   const handlePaymentStatusChange = async (id, newPaymentStatus, type) => {
     const endpoint = type === 'head' ? 'doll-heads' : 'doll-bodies';
     try {
-      const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}/payment-status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ payment_status: newPaymentStatus }),
-      });
-
-      if (response.ok) {
-        if (type === 'head') {
-          fetchDollHeads();
-        } else {
-          fetchDollBodies();
-        }
-        fetchDollStats();
-        if (newPaymentStatus === 'full_paid') {
-          alert('已标记为已付尾款！');
-        }
+      await apiPut(`/api/${endpoint}/${id}/payment-status`, { payment_status: newPaymentStatus });
+      if (type === 'head') {
+        fetchDollHeads();
+      } else {
+        fetchDollBodies();
+      }
+      fetchDollStats();
+      if (newPaymentStatus === 'full_paid') {
+        alert('已标记为已付尾款！');
       }
     } catch (error) {
       console.error('更新付款状态失败:', error);
@@ -935,26 +870,17 @@ const DollsPage = ({ currentUser }) => {
   const handleConfirmArrival = async (id, hasArrived, type) => {
     const endpoint = type === 'head' ? 'doll-heads' : 'doll-bodies';
     try {
-      const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}/confirm-arrival`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ hasArrived }),
-      });
-
-      if (response.ok) {
-        if (type === 'head') {
-          fetchDollHeads();
-        } else {
-          fetchDollBodies();
-        }
-        fetchDollStats();
-        if (hasArrived) {
-          alert('娃娃状态已更新为已到家！');
-        } else {
-          alert('娃娃已标记为逾期状态');
-        }
+      await apiPut(`/api/${endpoint}/${id}/confirm-arrival`, { hasArrived });
+      if (type === 'head') {
+        fetchDollHeads();
+      } else {
+        fetchDollBodies();
+      }
+      fetchDollStats();
+      if (hasArrived) {
+        alert('娃娃状态已更新为已到家！');
+      } else {
+        alert('娃娃已标记为逾期状态');
       }
     } catch (error) {
       console.error('确认到达状态失败:', error);
@@ -996,32 +922,22 @@ const DollsPage = ({ currentUser }) => {
         ? `/api/doll-heads/${editingImageItem.id}/image-position`
         : `/api/doll-bodies/${editingImageItem.id}/image-position`;
 
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          image_position_x: position.x,
-          image_position_y: position.y,
-          image_scale: scale,
-        }),
+      await apiPut(endpoint, {
+        image_position_x: position.x,
+        image_position_y: position.y,
+        image_scale: scale,
       });
-
-      if (response.ok) {
-        // 刷新数据
-        if (editingImageItem.type === 'head') {
-          fetchDollHeads();
+      
+      // 刷新数据
+      if (editingImageItem.type === 'head') {
+        fetchDollHeads();
         fetchDollStats();
-        } else {
-          fetchDollBodies();
-        fetchDollStats();
-        }
-        setImagePositionEditorOpen(false);
-        setEditingImageItem(null);
       } else {
-        console.error('更新图片位置失败');
+        fetchDollBodies();
+        fetchDollStats();
       }
+      setImagePositionEditorOpen(false);
+      setEditingImageItem(null);
     } catch (error) {
       console.error('更新图片位置失败:', error);
     }
@@ -1155,20 +1071,12 @@ const DollsPage = ({ currentUser }) => {
           profile_image_url: newCoverUrl
         };
 
-        const response = await fetch(`http://localhost:5000/api/doll-heads/${selectedDoll.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData),
-        });
-        if (response.ok) {
-          // 更新本地状态
-          setSelectedDoll(prev => ({...prev, profile_image_url: newCoverUrl}));
-          // 刷新列表
-          fetchDollHeads();
+        await apiPut(`/api/doll-heads/${selectedDoll.id}`, updateData);
+        // 更新本地状态
+        setSelectedDoll(prev => ({...prev, profile_image_url: newCoverUrl}));
+        // 刷新列表
+        fetchDollHeads();
         fetchDollStats();
-        }
       } catch (error) {
         console.error('更新娃头封面失败:', error);
       }
@@ -1190,18 +1098,10 @@ const DollsPage = ({ currentUser }) => {
           profile_image_url: newCoverUrl
         };
 
-        const response = await fetch(`http://localhost:5000/api/doll-bodies/${selectedDoll.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData),
-        });
-        if (response.ok) {
-          setSelectedDoll(prev => ({...prev, profile_image_url: newCoverUrl}));
-          fetchDollBodies();
+        await apiPut(`/api/doll-bodies/${selectedDoll.id}`, updateData);
+        setSelectedDoll(prev => ({...prev, profile_image_url: newCoverUrl}));
+        fetchDollBodies();
         fetchDollStats();
-        }
       } catch (error) {
         console.error('更新娃体封面失败:', error);
       }

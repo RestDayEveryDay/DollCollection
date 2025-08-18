@@ -1,7 +1,26 @@
 // API工具函数 - 自动添加认证token
 
-// 使用环境变量配置API地址，如果没有设置则使用默认值
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// 智能判断API地址：
+// 1. 如果设置了环境变量，使用环境变量
+// 2. 如果在Vercel上（通过域名判断），使用相对路径（同域）
+// 3. 否则使用本地开发地址
+const getApiBaseUrl = () => {
+  // 如果有环境变量，优先使用
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // 如果是生产环境（部署在Vercel），使用相对路径
+  // 这样API和前端在同一个域名下
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return ''; // 空字符串表示使用相对路径
+  }
+  
+  // 本地开发环境
+  return 'http://localhost:5000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // 带认证的fetch函数
 export const authFetch = async (url, options = {}) => {

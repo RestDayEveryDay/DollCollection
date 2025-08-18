@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiDelete } from '../utils/api';
 import './UnmadeMakeup.css';
 
 const UnmadeMakeup = ({ headId, onStatusChange }) => {
@@ -16,8 +17,7 @@ const UnmadeMakeup = ({ headId, onStatusChange }) => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
+      const data = await apiGet('/api/makeup-artists');
       setMakeupArtists(data);
       // 分离出收藏的妆师
       setFavoriteArtists(data.filter(artist => artist.is_favorite));
@@ -28,11 +28,8 @@ const UnmadeMakeup = ({ headId, onStatusChange }) => {
 
   const fetchSelectedArtists = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/unmade-preferences/${headId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedArtists(data.map(item => item.makeup_artist_id));
-      }
+      const data = await apiGet(`/api/unmade-preferences/${headId}`);
+      setSelectedArtists(data.map(item => item.makeup_artist_id));
     } catch (error) {
       console.error('获取心仪妆师失败:', error);
     }
@@ -44,25 +41,15 @@ const UnmadeMakeup = ({ headId, onStatusChange }) => {
     try {
       if (isSelected) {
         // 移除选择
-        const response = await fetch(`http://localhost:5000/api/unmade-preferences/${headId}/${artistId}`, {
-          method: 'DELETE'
-        });
-        if (response.ok) {
-          setSelectedArtists(prev => prev.filter(id => id !== artistId));
-        }
+        await apiDelete(`/api/unmade-preferences/${headId}/${artistId}`);
+        setSelectedArtists(prev => prev.filter(id => id !== artistId));
       } else {
         // 添加选择
-        const response = await fetch('http://localhost:5000/api/unmade-preferences', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            head_id: headId,
-            makeup_artist_id: artistId
-          })
+        await apiPost('/api/unmade-preferences', {
+          head_id: headId,
+          makeup_artist_id: artistId
         });
-        if (response.ok) {
-          setSelectedArtists(prev => [...prev, artistId]);
-        }
+        setSelectedArtists(prev => [...prev, artistId]);
       }
     } catch (error) {
       console.error('更新心仪妆师失败:', error);

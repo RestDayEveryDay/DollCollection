@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from './utils/api';
 import './App.css';
 import BottomNav from './components/BottomNav';
 import Login from './components/Login';
@@ -20,23 +21,16 @@ function App() {
     
     if (token && username) {
       // 验证token是否有效
-      fetch('http://localhost:5000/api/auth/verify', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          setIsLoggedIn(true);
-          setCurrentUser({ username });
-        } else {
-          // Token无效，清除本地存储
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
-        }
+      authFetch('/api/auth/verify')
+      .then(() => {
+        setIsLoggedIn(true);
+        setCurrentUser({ username });
       })
       .catch(error => {
         console.error('验证失败:', error);
+        // Token无效，清除本地存储
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
       })
       .finally(() => {
         setLoading(false);

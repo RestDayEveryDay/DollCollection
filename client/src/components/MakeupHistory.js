@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api';
 import ImageUpload from './ImageUpload';
 import CopyableText from './CopyableText';
 import './MakeupHistory.css';
@@ -32,8 +33,7 @@ const MakeupHistory = ({ headId, onUpdate }) => {
 
   const fetchMakeupHistory = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-history/${headId}`);
-      const data = await response.json();
+      const data = await apiGet(`/api/makeup-history/${headId}`);
       setMakeupHistory(data);
     } catch (error) {
       console.error('获取历史妆容失败:', error);
@@ -42,8 +42,7 @@ const MakeupHistory = ({ headId, onUpdate }) => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
+      const data = await apiGet('/api/makeup-artists');
       setMakeupArtists(data);
     } catch (error) {
       console.error('获取妆师列表失败:', error);
@@ -52,13 +51,8 @@ const MakeupHistory = ({ headId, onUpdate }) => {
 
   const fetchCurrentMakeup = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/current-makeup/${headId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentMakeup(data);
-      } else {
-        setCurrentMakeup(null);
-      }
+      const data = await apiGet(`/api/current-makeup/${headId}`);
+      setCurrentMakeup(data);
     } catch (error) {
       console.error('获取当前妆容失败:', error);
       setCurrentMakeup(null);
@@ -96,38 +90,28 @@ const MakeupHistory = ({ headId, onUpdate }) => {
     };
 
     try {
-      const url = editingHistory 
-        ? `http://localhost:5000/api/makeup-history/${editingHistory.id}`
-        : 'http://localhost:5000/api/makeup-history';
-      
-      const method = editingHistory ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.ok) {
-        // 如果是从当前妆容添加历史记录，需要清除当前妆容状态
-        if (selectedTab === 'from_current' && currentMakeup && !editingHistory) {
-          try {
-            await fetch(`http://localhost:5000/api/current-makeup/${headId}`, {
-              method: 'DELETE'
-            });
-            setCurrentMakeup(null);
-          } catch (error) {
-            console.error('清除当前妆容状态失败:', error);
-          }
-        }
-
-        fetchMakeupHistory();
-        setShowAddForm(false);
-        setEditingHistory(null);
-        setSelectedTab('new');
-        resetForm();
-        if (onUpdate) onUpdate();
+      if (editingHistory) {
+        await apiPut(`/api/makeup-history/${editingHistory.id}`, submitData);
+      } else {
+        await apiPost('/api/makeup-history', submitData);
       }
+
+      // 如果是从当前妆容添加历史记录，需要清除当前妆容状态
+      if (selectedTab === 'from_current' && currentMakeup && !editingHistory) {
+        try {
+          await apiDelete(`/api/current-makeup/${headId}`);
+          setCurrentMakeup(null);
+        } catch (error) {
+          console.error('清除当前妆容状态失败:', error);
+        }
+      }
+
+      fetchMakeupHistory();
+      setShowAddForm(false);
+      setEditingHistory(null);
+      setSelectedTab('new');
+      resetForm();
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error('保存历史妆容失败:', error);
     }
@@ -151,14 +135,9 @@ const MakeupHistory = ({ headId, onUpdate }) => {
     if (!window.confirm('确定要删除这个历史妆容记录吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-history/${historyId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        fetchMakeupHistory();
-        if (onUpdate) onUpdate();
-      }
+      await apiDelete(`/api/makeup-history/${historyId}`);
+      fetchMakeupHistory();
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error('删除历史妆容失败:', error);
     }

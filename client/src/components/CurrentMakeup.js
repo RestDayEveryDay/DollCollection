@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiGet, apiPost, apiDelete } from '../utils/api';
 import ImageUpload from './ImageUpload';
 import CopyableText from './CopyableText';
 import './CurrentMakeup.css';
@@ -30,11 +31,8 @@ const CurrentMakeup = ({ headId, onStatusChange }) => {
 
   const fetchCurrentMakeup = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/current-makeup/${headId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentMakeup(data);
-      }
+      const data = await apiGet(`/api/current-makeup/${headId}`);
+      setCurrentMakeup(data);
     } catch (error) {
       console.error('获取当前妆容失败:', error);
     }
@@ -42,8 +40,7 @@ const CurrentMakeup = ({ headId, onStatusChange }) => {
 
   const fetchMakeupHistory = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/makeup-history/${headId}`);
-      const data = await response.json();
+      const data = await apiGet(`/api/makeup-history/${headId}`);
       setMakeupHistory(data);
     } catch (error) {
       console.error('获取历史妆容失败:', error);
@@ -52,8 +49,7 @@ const CurrentMakeup = ({ headId, onStatusChange }) => {
 
   const fetchMakeupArtists = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/makeup-artists');
-      const data = await response.json();
+      const data = await apiGet('/api/makeup-artists');
       setMakeupArtists(data);
     } catch (error) {
       console.error('获取妆师列表失败:', error);
@@ -107,18 +103,11 @@ const CurrentMakeup = ({ headId, onStatusChange }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/current-makeup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.ok) {
-        fetchCurrentMakeup();
-        setShowSetForm(false);
-        resetForm();
-        if (onStatusChange) onStatusChange();
-      }
+      await apiPost('/api/current-makeup', submitData);
+      fetchCurrentMakeup();
+      setShowSetForm(false);
+      resetForm();
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('设置当前妆容失败:', error);
     }
@@ -128,14 +117,9 @@ const CurrentMakeup = ({ headId, onStatusChange }) => {
     if (!window.confirm('确定要清除当前妆容吗？')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/current-makeup/${headId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setCurrentMakeup(null);
-        if (onStatusChange) onStatusChange();
-      }
+      await apiDelete(`/api/current-makeup/${headId}`);
+      setCurrentMakeup(null);
+      if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error('清除当前妆容失败:', error);
     }
