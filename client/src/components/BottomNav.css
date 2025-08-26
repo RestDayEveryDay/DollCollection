@@ -1,0 +1,68 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 2px solid rgba(200, 162, 200, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 20px 12px;
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  min-width: 70px;
+}
+
+.nav-tab:hover {
+  background: rgba(200, 162, 200, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-tab.active {
+  background: rgba(200, 162, 200, 0.15);
+  color: #C8A2C8;
+}
+
+.nav-tab.active .nav-icon {
+  transform: scale(1.2);
+}
+
+.nav-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+  transition: transform 0.3s ease;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4A5568;
+  transition: color 0.3s ease;
+}
+
+.nav-tab.active .nav-label {
+  color: #C8A2C8;
+}
+
+/* 为主内容添加底部边距，避免被导航遮挡 */
+body {
+  padding-bottom: 60px;
+}
