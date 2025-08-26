@@ -1,0 +1,318 @@
+/* 娃头编辑Modal样式 - 与整体风格保持一致 */
+.doll-head-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 表单分区 */
+.form-section {
+  background: #F9F5FF;
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid rgba(200, 162, 200, 0.1);
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  background: #F5F0FF;
+  box-shadow: 0 4px 15px rgba(200, 162, 200, 0.15);
+}
+
+.section-title {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5A4FCF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 表单行 */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* 表单组 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 14px;
+  border: 2px solid #E8E8E8;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: white;
+  color: #4A5568;
+  outline: none;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: #C8A2C8;
+  background: #FEFEFF;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #FFB3E6;
+  background: white;
+  box-shadow: 0 4px 15px rgba(255, 179, 230, 0.2);
+}
+
+.form-group input::placeholder {
+  color: #B8B8B8;
+  font-size: 0.85rem;
+}
+
+/* 必填字段标记 */
+.form-group label:has(+ input[required])::after,
+.form-group label:has(+ select[required])::after {
+  content: ' *';
+  color: #FF6B9D;
+}
+
+/* 尺寸分类选择器 */
+.size-category-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.size-category-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.size-category-btn {
+  padding: 10px 20px;
+  border: 2px solid #E8E8E8;
+  border-radius: 20px;
+  background: white;
+  color: #6B7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.size-category-btn:hover {
+  border-color: #C8A2C8;
+  color: #5A4FCF;
+  background: #F9F5FF;
+  transform: translateY(-2px);
+}
+
+.size-category-btn.selected {
+  background: #C8A2C8;
+  color: white;
+  border-color: #C8A2C8;
+  box-shadow: 0 4px 15px rgba(200, 162, 200, 0.3);
+}
+
+.size-category-btn.selected:hover {
+  background: #B892B8;
+  border-color: #B892B8;
+  box-shadow: 0 6px 20px rgba(200, 162, 200, 0.4);
+}
+
+/* 表单操作按钮 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 2px solid #F0F0F0;
+}
+
+.cancel-btn,
+.submit-btn {
+  padding: 12px 28px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+}
+
+.cancel-btn {
+  background: #F5F5F5;
+  color: #6B7280;
+}
+
+.cancel-btn:hover {
+  background: #E8E8E8;
+  color: #4A5568;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.submit-btn {
+  background: #A8D8B8;
+  color: #4A5568;
+  box-shadow: 0 4px 15px rgba(168, 216, 184, 0.3);
+}
+
+.submit-btn:hover {
+  background: #98C8A8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(152, 200, 168, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* 价格信息特殊样式 */
+.form-section:nth-child(2) {
+  background: #FFF5F8;
+  border-color: rgba(255, 179, 230, 0.1);
+}
+
+.form-section:nth-child(2):hover {
+  background: #FFF0F5;
+  box-shadow: 0 4px 15px rgba(255, 179, 230, 0.15);
+}
+
+/* 其他信息特殊样式 */
+.form-section:nth-child(3) {
+  background: #F0F8FF;
+  border-color: rgba(135, 206, 235, 0.1);
+}
+
+.form-section:nth-child(3):hover {
+  background: #E8F4FF;
+  box-shadow: 0 4px 15px rgba(135, 206, 235, 0.15);
+}
+
+/* 尺寸分类特殊样式 */
+.form-section:nth-child(4) {
+  background: #F5FFF8;
+  border-color: rgba(168, 216, 184, 0.1);
+}
+
+.form-section:nth-child(4):hover {
+  background: #F0FFF5;
+  box-shadow: 0 4px 15px rgba(168, 216, 184, 0.15);
+}
+
+/* 图片上传区域 */
+.form-section:last-child {
+  background: linear-gradient(135deg, #F9F5FF 0%, #FFF5F8 100%);
+  border: 2px dashed rgba(200, 162, 200, 0.3);
+}
+
+.form-section:last-child:hover {
+  background: linear-gradient(135deg, #F5F0FF 0%, #FFF0F5 100%);
+  border-color: rgba(200, 162, 200, 0.5);
+  box-shadow: 0 4px 20px rgba(200, 162, 200, 0.2);
+}
+
+/* 输入框组动画 */
+.form-group input:focus,
+.form-group select:focus {
+  animation: inputFocus 0.3s ease;
+}
+
+@keyframes inputFocus {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 空气娃相关字段动画 */
+.form-row:has(input[type="date"]) {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .size-category-options {
+    justify-content: flex-start;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+  }
+  
+  .form-section {
+    padding: 16px;
+    border-radius: 16px;
+  }
+}
+
+/* 表单验证提示样式 */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown) {
+  border-color: #FF6B9D;
+  background: #FFF5F8;
+}
+
+.form-group input:valid:not(:placeholder-shown),
+.form-group select:valid:not(:placeholder-shown) {
+  border-color: #A8D8B8;
+  background: #F5FFF8;
+}
+
+/* 禁用状态 */
+.submit-btn:disabled {
+  background: #E0E0E0;
+  color: #9E9E9E;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.submit-btn:disabled:hover {
+  transform: none;
+  background: #E0E0E0;
+}

@@ -1,0 +1,264 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 2px solid rgba(200, 162, 200, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 20px 12px;
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  min-width: 70px;
+}
+
+.nav-tab:hover {
+  background: rgba(200, 162, 200, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-tab.active {
+  background: rgba(200, 162, 200, 0.15);
+  color: #C8A2C8;
+}
+
+.nav-tab.active .nav-icon {
+  transform: scale(1.2);
+}
+
+.nav-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+  transition: transform 0.3s ease;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4A5568;
+  transition: color 0.3s ease;
+}
+
+.nav-tab.active .nav-label {
+  color: #C8A2C8;
+}
+
+/* 为主内容添加底部边距，避免被导航遮挡 */
+body {
+  padding-bottom: 60px;
+}
+
+/* 添加按钮容器 */
+.add-button-container {
+  position: relative;
+}
+
+/* 添加按钮样式 */
+.nav-add {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFB3E6 0%, #C8A2C8 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(200, 162, 200, 0.4);
+  position: relative;
+  top: -5px; /* 让圆形按钮稍微突出 */
+  min-width: 56px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-add:hover {
+  background: linear-gradient(135deg, #FFC1E9 0%, #D4B0D4 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 25px rgba(200, 162, 200, 0.5);
+}
+
+.nav-add.active {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  transform: translateY(-5px) rotate(45deg);
+}
+
+.nav-add-icon {
+  font-size: 32px;
+  font-weight: 300;
+  color: white;
+  transition: transform 0.3s ease;
+  line-height: 1;
+  margin: 0;
+}
+
+.nav-add.active .nav-add-icon {
+  transform: none;
+}
+
+.nav-add .nav-label {
+  display: none; /* 圆形按钮不显示文字标签 */
+}
+
+/* 添加菜单 */
+.add-menu {
+  position: absolute;
+  bottom: 75px; /* 调整位置以配合圆形按钮 */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  min-width: 200px;
+  animation: slideUp 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  overflow: hidden;
+  z-index: 1001;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 菜单项 */
+.add-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.add-menu-items.hidden {
+  display: none;
+}
+
+.add-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+.add-menu-item:hover {
+  background: linear-gradient(135deg, #FFF5FA 0%, #F8E8F8 100%);
+  transform: translateX(4px);
+}
+
+.add-menu-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.add-menu-text {
+  font-size: 14px;
+  color: #4A5568;
+  font-weight: 500;
+  flex: 1;
+}
+
+.add-menu-arrow {
+  font-size: 16px;
+  color: #A0A0A0;
+  margin-left: auto;
+}
+
+/* 子菜单 */
+.add-submenu {
+  animation: slideLeft 0.3s ease;
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.add-back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-bottom: 8px;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.add-back-button:hover {
+  background: #F3F4F6;
+}
+
+.add-back-arrow {
+  font-size: 18px;
+}
+
+.add-submenu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* 滚动条样式 */
+.add-submenu-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.add-submenu-items::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 3px;
+}
+
+.add-submenu-items::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+.add-submenu-items::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}

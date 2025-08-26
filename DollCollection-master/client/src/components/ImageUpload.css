@@ -1,0 +1,128 @@
+.image-upload {
+  width: 100%;
+}
+
+.upload-area {
+  position: relative;
+  border: 2px dashed rgba(200, 162, 200, 0.4);
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.upload-area:hover {
+  border-color: #FFB3E6;
+  background: rgba(255, 179, 230, 0.1);
+  transform: translateY(-2px);
+}
+
+.upload-placeholder {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6B7280;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.7;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #5A4FCF;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+.image-preview {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-preview:hover .image-overlay {
+  opacity: 1;
+}
+
+.uploading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.loading-spinner {
+  font-size: 24px;
+  margin-bottom: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.image-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.change-btn,
+.remove-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.change-btn {
+  background: #87CEEB;
+  color: white;
+}
+
+.change-btn:hover {
+  background: #77BFDB;
+  transform: translateY(-1px);
+}
+
+.remove-btn {
+  background: #FFB3BA;
+  color: white;
+}
+
+.remove-btn:hover {
+  background: #FF99AA;
+  transform: translateY(-1px);
+}

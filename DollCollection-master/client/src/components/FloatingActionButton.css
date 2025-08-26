@@ -1,0 +1,231 @@
+/* 悬浮按钮容器 */
+.floating-action-button-container {
+  position: fixed;
+  bottom: 80px; /* 调整到底部导航栏上方 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+}
+
+/* 主按钮 */
+.fab-main {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFB3E6 0%, #C8A2C8 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(200, 162, 200, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  outline: none;
+}
+
+.fab-main:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(200, 162, 200, 0.5);
+  background: linear-gradient(135deg, #FFC1E9 0%, #D4B0D4 100%);
+}
+
+.fab-main:active {
+  transform: scale(0.95);
+}
+
+.fab-main.fab-open {
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+}
+
+.fab-icon {
+  font-size: 28px;
+  color: white;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* 菜单 */
+.fab-menu {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  min-width: 200px;
+  animation: slideUp 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 菜单项 */
+.fab-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fab-menu-items.hidden {
+  display: none;
+}
+
+.fab-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+.fab-menu-item:hover {
+  background: linear-gradient(135deg, #FFF5FA 0%, #F8E8F8 100%);
+  transform: translateX(4px);
+}
+
+.fab-menu-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.fab-menu-text {
+  font-size: 14px;
+  color: #4A5568;
+  font-weight: 500;
+  flex: 1;
+}
+
+.fab-menu-arrow {
+  font-size: 16px;
+  color: #A0A0A0;
+  margin-left: auto;
+}
+
+/* 子菜单 */
+.fab-submenu {
+  animation: slideLeft 0.3s ease;
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fab-back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-bottom: 8px;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fab-back-button:hover {
+  background: #F3F4F6;
+}
+
+.fab-back-arrow {
+  font-size: 18px;
+}
+
+.fab-submenu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* 滚动条样式 */
+.fab-submenu-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fab-submenu-items::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 3px;
+}
+
+.fab-submenu-items::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+.fab-submenu-items::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .floating-action-button-container {
+    bottom: 70px; /* 移动端也保持在底部导航栏上方 */
+  }
+
+  .fab-main {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab-icon {
+    font-size: 24px;
+  }
+
+  .fab-menu {
+    max-width: calc(100vw - 40px);
+  }
+}
+
+/* 暗色遮罩（可选） */
+.fab-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
