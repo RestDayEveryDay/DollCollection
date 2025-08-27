@@ -282,7 +282,7 @@ const MakeupPage = ({ currentUser }) => {
       const result = await apiPost('/api/makeup-artists/create-from-appointment', { appointment_id: appointmentId });
       
       if (result.existed) {
-        alert(`妆师 "${artistName}" 已存在妆师档案中！`);
+        alert(`妆师 "${artistName}" 已存在妆师簿子中！`);
       } else if (result.created) {
         alert(`成功为 "${artistName}" 创建妆师卡片！`);
         fetchMakeupArtists(); // 刷新妆师列表
@@ -393,7 +393,7 @@ const MakeupPage = ({ currentUser }) => {
   return (
     <div className="page-content">
       <div className="page-header">
-        <h1>{currentUser?.username || '我'}的妆师档案</h1>
+        <h1>{currentUser?.username || '我'}的妆师簿子</h1>
         <div className="header-tabs">
           <button 
             className={`tab-button ${activeTab === 'artists' ? 'active' : ''}`}
@@ -461,7 +461,7 @@ const MakeupPage = ({ currentUser }) => {
                     onClick={batchCreateArtistsFromAppointments}
                     title="为所有未建档的约妆妆师创建档案"
                   >
-                    🎯 一键构建所有妆师档案
+                    🎯 一键构建所有妆师簿子
                   </button>
                   <span className="batch-create-hint">将自动为所有未建档的约妆妆师创建档案</span>
                 </div>

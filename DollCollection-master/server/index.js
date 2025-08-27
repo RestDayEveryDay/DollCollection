@@ -63,6 +63,7 @@ function initializeDatabase() {
       makeup_rules_image TEXT,
       note_template TEXT,
       is_favorite BOOLEAN DEFAULT 0,
+      user_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
@@ -214,6 +215,7 @@ function initializeDatabase() {
       final_payment_date TEXT,
       profile_image_url TEXT,
       sort_order INTEGER DEFAULT 0,
+      user_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -286,6 +288,17 @@ function addMissingColumns() {
       });
     }
     
+    // 检查并添加user_id字段
+    if (!columnNames.includes('user_id')) {
+      db.run("ALTER TABLE makeup_artists ADD COLUMN user_id INTEGER", (err) => {
+        if (err) {
+          console.error('添加user_id字段失败:', err);
+        } else {
+          console.log('成功添加makeup_artists表user_id字段');
+        }
+      });
+    }
+    
     // 检查并添加sort_order字段
     if (!columnNames.includes('sort_order')) {
       db.run("ALTER TABLE makeup_artists ADD COLUMN sort_order INTEGER DEFAULT 0", (err) => {
@@ -309,7 +322,7 @@ function addMissingColumns() {
     }
   });
 
-  // 检查doll_heads表的列
+  // 检查doll_heads表的列 - 添加相册排序和置顶字段
   db.all("PRAGMA table_info(doll_heads)", [], (err, columns) => {
     if (err) {
       console.error('获取doll_heads表信息失败:', err);
@@ -320,6 +333,7 @@ function addMissingColumns() {
     
     // 添加新字段到doll_heads表
     const headsNewColumns = [
+      { name: 'user_id', type: 'INTEGER' },
       { name: 'sort_order', type: 'INTEGER DEFAULT 0' },
       { name: 'original_price', type: 'REAL' },
       { name: 'actual_price', type: 'REAL' },
@@ -336,7 +350,9 @@ function addMissingColumns() {
       { name: 'deposit', type: 'REAL' },
       { name: 'final_payment', type: 'REAL' },
       { name: 'final_payment_date', type: 'TEXT' },
-      { name: 'payment_status', type: 'TEXT DEFAULT "deposit_only"' }
+      { name: 'payment_status', type: 'TEXT DEFAULT "deposit_only"' },
+      { name: 'album_sort_order', type: 'INTEGER DEFAULT 999999' },
+      { name: 'album_is_pinned', type: 'INTEGER DEFAULT 0' }
     ];
 
     headsNewColumns.forEach(column => {
@@ -363,6 +379,7 @@ function addMissingColumns() {
     
     // 添加新字段到doll_bodies表
     const bodiesNewColumns = [
+      { name: 'user_id', type: 'INTEGER' },
       { name: 'sort_order', type: 'INTEGER DEFAULT 0' },
       { name: 'original_price', type: 'REAL' },
       { name: 'actual_price', type: 'REAL' },
@@ -379,7 +396,9 @@ function addMissingColumns() {
       { name: 'deposit', type: 'REAL' },
       { name: 'final_payment', type: 'REAL' },
       { name: 'final_payment_date', type: 'TEXT' },
-      { name: 'payment_status', type: 'TEXT DEFAULT "deposit_only"' }
+      { name: 'payment_status', type: 'TEXT DEFAULT "deposit_only"' },
+      { name: 'album_sort_order', type: 'INTEGER DEFAULT 999999' },
+      { name: 'album_is_pinned', type: 'INTEGER DEFAULT 0' }
     ];
 
     bodiesNewColumns.forEach(column => {
@@ -432,6 +451,17 @@ function addMissingColumns() {
     }
     
     const columnNames = columns.map(col => col.name);
+    
+    // 检查并添加user_id字段
+    if (!columnNames.includes('user_id')) {
+      db.run("ALTER TABLE wardrobe_items ADD COLUMN user_id INTEGER", (err) => {
+        if (err) {
+          console.error('添加wardrobe_items表user_id字段失败:', err);
+        } else {
+          console.log('成功添加wardrobe_items表user_id字段');
+        }
+      });
+    }
     
     // 检查并添加sizes字段
     if (!columnNames.includes('sizes')) {
@@ -497,6 +527,42 @@ function addMissingColumns() {
       });
     }
   });
+  
+  // 为现有数据设置默认用户ID（如果需要）
+  setTimeout(() => {
+    // 获取默认用户ID（休息日）
+    db.get('SELECT id FROM users WHERE username = ?', ['休息日'], (err, user) => {
+      if (!err && user) {
+        // 更新没有user_id的doll_heads记录
+        db.run('UPDATE doll_heads SET user_id = ? WHERE user_id IS NULL', [user.id], (err) => {
+          if (!err) {
+            console.log('已为现有娃头数据设置用户ID');
+          }
+        });
+        
+        // 更新没有user_id的doll_bodies记录
+        db.run('UPDATE doll_bodies SET user_id = ? WHERE user_id IS NULL', [user.id], (err) => {
+          if (!err) {
+            console.log('已为现有娃体数据设置用户ID');
+          }
+        });
+        
+        // 更新没有user_id的wardrobe_items记录
+        db.run('UPDATE wardrobe_items SET user_id = ? WHERE user_id IS NULL', [user.id], (err) => {
+          if (!err) {
+            console.log('已为现有衣柜数据设置用户ID');
+          }
+        });
+        
+        // 更新没有user_id的makeup_artists记录
+        db.run('UPDATE makeup_artists SET user_id = ? WHERE user_id IS NULL', [user.id], (err) => {
+          if (!err) {
+            console.log('已为现有妆师数据设置用户ID');
+          }
+        });
+      }
+    });
+  }, 2000); // 延迟2秒确保用户表已创建
 }
 
 // ==================== 认证相关路由 ====================
@@ -621,6 +687,209 @@ app.get('/api/auth/user-info', auth.authMiddleware, (req, res) => {
 
 // ==================== 需要认证的API路由 ====================
 // 从这里开始，所有路由都需要认证
+
+// 更新相册排序
+app.post('/api/albums/sort', auth.authMiddleware, (req, res) => {
+  const { sortOrder } = req.body; // [{id, type, order}]
+  const userId = req.userId;
+  
+  const updatePromises = sortOrder.map(item => {
+    return new Promise((resolve, reject) => {
+      const table = item.type === 'head' ? 'doll_heads' : 'doll_bodies';
+      db.run(
+        `UPDATE ${table} SET album_sort_order = ? WHERE id = ? AND user_id = ?`,
+        [item.order, item.id, userId],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+  });
+  
+  Promise.all(updatePromises)
+    .then(() => res.json({ message: '排序更新成功' }))
+    .catch(err => {
+      console.error('更新排序失败:', err);
+      res.status(500).json({ error: '更新排序失败' });
+    });
+});
+
+// 切换相册置顶状态
+app.put('/api/albums/toggle-pin/:type/:id', auth.authMiddleware, (req, res) => {
+  const { type, id } = req.params;
+  const userId = req.userId;
+  const table = type === 'head' ? 'doll_heads' : 'doll_bodies';
+  
+  // 先获取当前置顶状态
+  db.get(
+    `SELECT album_is_pinned FROM ${table} WHERE id = ? AND user_id = ?`,
+    [id, userId],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: '获取置顶状态失败' });
+      }
+      
+      const newPinStatus = row.album_is_pinned ? 0 : 1;
+      
+      // 更新置顶状态
+      db.run(
+        `UPDATE ${table} SET album_is_pinned = ? WHERE id = ? AND user_id = ?`,
+        [newPinStatus, id, userId],
+        (err) => {
+          if (err) {
+            return res.status(500).json({ error: '更新置顶状态失败' });
+          }
+          res.json({ isPinned: newPinStatus === 1 });
+        }
+      );
+    }
+  );
+});
+
+// 获取相册照片数量和数据
+app.get('/api/albums/photo-count/:id', auth.authMiddleware, (req, res) => {
+  const { id } = req.params;
+  const { type } = req.query; // 'head' or 'body'
+  const userId = req.userId;
+  
+  const photos = [];
+  let lastUpdate = null;
+  
+  // 收集所有相关照片的Promise
+  const photoPromises = [];
+  
+  if (type === 'head') {
+    // 获取娃头的官方图
+    photoPromises.push(new Promise((resolve) => {
+      db.get('SELECT profile_image_url, created_at FROM doll_heads WHERE id = ? AND user_id = ?', 
+        [id, userId], 
+        (err, row) => {
+          if (!err && row && row.profile_image_url) {
+            photos.push({ url: row.profile_image_url, type: '官方图', date: row.created_at });
+            if (!lastUpdate || new Date(row.created_at) > new Date(lastUpdate)) {
+              lastUpdate = row.created_at;
+            }
+          }
+          resolve();
+        });
+    }));
+    
+    // 获取相册照片
+    photoPromises.push(new Promise((resolve) => {
+      db.all('SELECT image_url, caption, created_at FROM photos WHERE entity_type = "head" AND entity_id = ?', 
+        [id], 
+        (err, rows) => {
+          if (!err && rows) {
+            rows.forEach(row => {
+              photos.push({ url: row.image_url, type: '相册', caption: row.caption, date: row.created_at });
+              if (!lastUpdate || new Date(row.created_at) > new Date(lastUpdate)) {
+                lastUpdate = row.created_at;
+              }
+            });
+          }
+          resolve();
+        });
+    }));
+    
+    // 获取当前妆容照片
+    photoPromises.push(new Promise((resolve) => {
+      db.get('SELECT image_url, makeup_date FROM head_current_makeup WHERE head_id = ?', 
+        [id], 
+        (err, row) => {
+          if (!err && row && row.image_url) {
+            photos.push({ url: row.image_url, type: '当前妆容', date: row.makeup_date });
+            if (!lastUpdate || new Date(row.makeup_date) > new Date(lastUpdate)) {
+              lastUpdate = row.makeup_date;
+            }
+          }
+          resolve();
+        });
+    }));
+    
+    // 获取历史妆容照片
+    photoPromises.push(new Promise((resolve) => {
+      db.all('SELECT image_url, makeup_date FROM head_makeup_history WHERE head_id = ?', 
+        [id], 
+        (err, rows) => {
+          if (!err && rows) {
+            rows.forEach(row => {
+              if (row.image_url) {
+                photos.push({ url: row.image_url, type: '历史妆容', date: row.makeup_date });
+                if (!lastUpdate || new Date(row.makeup_date) > new Date(lastUpdate)) {
+                  lastUpdate = row.makeup_date;
+                }
+              }
+            });
+          }
+          resolve();
+        });
+    }));
+    
+  } else if (type === 'body') {
+    // 获取娃体的官方图
+    photoPromises.push(new Promise((resolve) => {
+      db.get('SELECT profile_image_url, created_at FROM doll_bodies WHERE id = ? AND user_id = ?', 
+        [id, userId], 
+        (err, row) => {
+          if (!err && row && row.profile_image_url) {
+            photos.push({ url: row.profile_image_url, type: '官方图', date: row.created_at });
+            if (!lastUpdate || new Date(row.created_at) > new Date(lastUpdate)) {
+              lastUpdate = row.created_at;
+            }
+          }
+          resolve();
+        });
+    }));
+    
+    // 获取相册照片
+    photoPromises.push(new Promise((resolve) => {
+      db.all('SELECT image_url, caption, created_at FROM photos WHERE entity_type = "body" AND entity_id = ?', 
+        [id], 
+        (err, rows) => {
+          if (!err && rows) {
+            rows.forEach(row => {
+              photos.push({ url: row.image_url, type: '相册', caption: row.caption, date: row.created_at });
+              if (!lastUpdate || new Date(row.created_at) > new Date(lastUpdate)) {
+                lastUpdate = row.created_at;
+              }
+            });
+          }
+          resolve();
+        });
+    }));
+    
+    // 获取娃体妆容照片
+    photoPromises.push(new Promise((resolve) => {
+      db.get('SELECT image_url, makeup_date FROM body_makeup WHERE body_id = ?', 
+        [id], 
+        (err, row) => {
+          if (!err && row && row.image_url) {
+            photos.push({ url: row.image_url, type: '娃体妆容', date: row.makeup_date });
+            if (!lastUpdate || new Date(row.makeup_date) > new Date(lastUpdate)) {
+              lastUpdate = row.makeup_date;
+            }
+          }
+          resolve();
+        });
+    }));
+  }
+  
+  // 等待所有查询完成
+  Promise.all(photoPromises).then(() => {
+    // 按日期排序
+    photos.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    
+    res.json({
+      total: photos.length,
+      lastUpdate: lastUpdate,
+      photos: photos.slice(0, 50) // 限制返回前50张
+    });
+  }).catch(err => {
+    console.error('获取相册数据失败:', err);
+    res.status(500).json({ error: '获取相册数据失败' });
+  });
+});
 
 // 娃娃统计API
 app.get('/api/dolls/stats', auth.authMiddleware, (req, res) => {
