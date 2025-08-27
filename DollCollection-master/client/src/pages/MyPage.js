@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
 import { apiGet, apiPut } from '../utils/api';
+import ImageUpload from '../components/ImageUpload';
 
 // 花费统计卡片组件
 const ExpenseCard = ({ title, icon, amount, color, percentage, details }) => {
@@ -40,10 +41,13 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
   const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
+  const [userAvatar, setUserAvatar] = useState(null);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   useEffect(() => {
     fetchExpenseStats();
     fetchPaymentReminders();
+    fetchUserInfo();
     setLoading(false);
   }, []);
 
@@ -53,6 +57,17 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
       setExpenseStats(data);
     } catch (error) {
       console.error('获取花费统计失败:', error);
+    }
+  };
+
+  const fetchUserInfo = async () => {
+    try {
+      const data = await apiGet('/api/auth/user-info');
+      if (data.avatar) {
+        setUserAvatar(data.avatar);
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
     }
   };
 
@@ -85,6 +100,21 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
     }
   };
 
+  // 处理头像更新
+  const handleAvatarUpdate = async (imageUrl) => {
+    try {
+      await apiPut('/api/auth/update-avatar', { avatar: imageUrl });
+      setUserAvatar(imageUrl);
+      setShowAvatarModal(false);
+      // 更新当前用户信息
+      if (currentUser) {
+        currentUser.avatar = imageUrl;
+      }
+    } catch (error) {
+      console.error('更新头像失败:', error);
+      alert('更新头像失败，请重试');
+    }
+  };
 
   // 获取尾款提醒数据
   const fetchPaymentReminders = async () => {
@@ -218,8 +248,23 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
       {/* 顶部用户信息区域 */}
       <div className="profile-header">
         <div className="profile-header-content">
-          <div className="profile-avatar">
-            <span className="avatar-icon">👤</span>
+          <div 
+            className="profile-avatar clickable"
+            onClick={() => setShowAvatarModal(true)}
+            title="点击修改头像"
+          >
+            {userAvatar ? (
+              <img 
+                src={userAvatar} 
+                alt="用户头像" 
+                className="avatar-image"
+              />
+            ) : (
+              <span className="avatar-icon">👤</span>
+            )}
+            <div className="avatar-overlay">
+              <span className="avatar-edit-icon">📷</span>
+            </div>
           </div>
           <div className="profile-info">
             <div className="profile-username">
@@ -290,6 +335,38 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
               >
                 确认修改
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 修改头像弹窗 */}
+      {showAvatarModal && (
+        <div className="modal-overlay" onClick={() => setShowAvatarModal(false)}>
+          <div className="modal-content avatar-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>修改头像</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowAvatarModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <ImageUpload
+                onImageSelect={handleAvatarUpdate}
+                currentImage={userAvatar}
+                placeholder="选择新头像"
+              />
+              <div className="avatar-preview">
+                {userAvatar && (
+                  <div>
+                    <p>当前头像：</p>
+                    <img src={userAvatar} alt="当前头像" className="preview-image" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

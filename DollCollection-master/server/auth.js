@@ -19,6 +19,7 @@ const initUserTable = () => {
         username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         email TEXT,
+        avatar TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         last_login DATETIME,
         is_active BOOLEAN DEFAULT 1

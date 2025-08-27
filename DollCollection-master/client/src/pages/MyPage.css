@@ -23,11 +23,52 @@
   justify-content: center;
   backdrop-filter: blur(10px);
   border: 3px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar.clickable:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-avatar:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .avatar-icon {
   font-size: 40px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+}
+
+.avatar-edit-icon {
+  font-size: 24px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .profile-info {
@@ -950,4 +991,33 @@
 .confirm-btn:hover {
   background: #9bc9c8;
   transform: translateY(-1px);
+}
+
+/* 头像上传模态框样式 */
+.avatar-modal {
+  max-width: 500px;
+}
+
+.avatar-modal .modal-body {
+  padding: 20px;
+}
+
+.avatar-preview {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.avatar-preview p {
+  color: #666;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.avatar-preview .preview-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #aed9d8;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }

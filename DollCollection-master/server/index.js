@@ -222,6 +222,27 @@ function initializeDatabase() {
 }
 
 function addMissingColumns() {
+  // 检查users表的列
+  db.all("PRAGMA table_info(users)", [], (err, columns) => {
+    if (err) {
+      console.error('获取users表信息失败:', err);
+      return;
+    }
+    
+    const columnNames = columns.map(col => col.name);
+    
+    // 检查并添加avatar字段
+    if (!columnNames.includes('avatar')) {
+      db.run("ALTER TABLE users ADD COLUMN avatar TEXT", (err) => {
+        if (err) {
+          console.error('添加avatar字段失败:', err);
+        } else {
+          console.log('成功添加users表avatar字段');
+        }
+      });
+    }
+  });
+
   // 检查makeup_artists表的列
   db.all("PRAGMA table_info(makeup_artists)", [], (err, columns) => {
     if (err) {
@@ -552,6 +573,50 @@ app.put('/api/auth/change-username', auth.authMiddleware, async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+// 更新用户头像
+app.put('/api/auth/update-avatar', auth.authMiddleware, (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.userId;
+  
+  db.run(
+    'UPDATE users SET avatar = ? WHERE id = ?',
+    [avatar, userId],
+    function(err) {
+      if (err) {
+        console.error('更新头像失败:', err);
+        res.status(500).json({ error: '更新头像失败' });
+        return;
+      }
+      
+      res.json({ message: '头像更新成功', avatar });
+    }
+  );
+});
+
+// 获取用户信息（包含头像）
+app.get('/api/auth/user-info', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  
+  db.get(
+    'SELECT id, username, avatar FROM users WHERE id = ?',
+    [userId],
+    (err, user) => {
+      if (err) {
+        console.error('获取用户信息失败:', err);
+        res.status(500).json({ error: '获取用户信息失败' });
+        return;
+      }
+      
+      if (!user) {
+        res.status(404).json({ error: '用户不存在' });
+        return;
+      }
+      
+      res.json(user);
+    }
+  );
 });
 
 // ==================== 需要认证的API路由 ====================
