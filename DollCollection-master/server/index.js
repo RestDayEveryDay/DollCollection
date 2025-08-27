@@ -8,9 +8,15 @@ const auth = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(cors());
 app.use(express.json());
+
+// 生产环境服务静态文件
+if (isProduction) {
+  app.use(express.static(path.join(__dirname, '../client/build')));
+}
 
 // 静态文件服务
 app.use('/uploads', express.static('uploads'));
@@ -2968,6 +2974,13 @@ app.put('/api/wardrobe/:id/image-position', auth.authMiddleware, (req, res) => {
     });
   });
 });
+
+// 生产环境下，所有其他路由返回React应用
+if (isProduction) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
