@@ -45,12 +45,30 @@
 }
 
 /* MyPage 黑夜模式适配 */
-[data-theme='dark'] .profile-username h2 {
+/* 确保顶部用户信息区域使用亮色文字 */
+[data-theme='dark'] .profile-header {
   color: white;
 }
 
+[data-theme='dark'] .profile-username h2 {
+  color: white !important;
+}
+
 [data-theme='dark'] .profile-subtitle {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme='dark'] .profile-username button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+[data-theme='dark'] .profile-username button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme='dark'] .header-actions button {
+  color: white;
 }
 
 [data-theme='dark'] .expense-section,
@@ -214,8 +232,17 @@
 
 /* App.css 中的通用组件黑夜模式 */
 [data-theme='dark'] .page-header {
-  background: var(--color-secondary);
-  color: var(--text-inverse);
+  background: var(--color-primary);
+  color: white;
+}
+
+[data-theme='dark'] .page-header h1,
+[data-theme='dark'] .page-header h2 {
+  color: white !important;
+}
+
+[data-theme='dark'] .header-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 [data-theme='dark'] .artist-card,
