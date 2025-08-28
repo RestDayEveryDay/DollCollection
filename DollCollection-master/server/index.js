@@ -7,7 +7,7 @@ const fs = require('fs');
 const auth = require('./auth');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(cors());
@@ -764,23 +764,45 @@ app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
   // 获取所有娃头数据
   db.all('SELECT name, company, actual_price FROM doll_heads WHERE user_id = ? ORDER BY name', [userId], (err, heads) => {
     if (err) {
-      return res.status(500).json({ error: '获取娃头数据失败' });
+      console.error('获取娃头数据失败:', err);
+      return res.status(500).json({ error: '获取娃头数据失败', details: err.message });
     }
+    console.log('娃头数据:', heads ? heads.length : 0, '条');
     
     // 获取所有娃体数据
     db.all('SELECT name, company, actual_price FROM doll_bodies WHERE user_id = ? ORDER BY name', [userId], (err, bodies) => {
       if (err) {
-        return res.status(500).json({ error: '获取娃体数据失败' });
+        console.error('获取娃体数据失败:', err);
+        return res.status(500).json({ error: '获取娃体数据失败', details: err.message });
       }
+      console.log('娃体数据:', bodies ? bodies.length : 0, '条');
       
-      // 获取所有配件数据
-      db.all(`SELECT name, category, brand, purchase_price 
+      // 获取所有配件数据（衣柜）
+      db.all(`SELECT name, category, brand, total_price 
               FROM wardrobe_items 
               WHERE user_id = ? 
               ORDER BY category, name`, [userId], (err, items) => {
         if (err) {
-          return res.status(500).json({ error: '获取配件数据失败' });
+          console.error('获取配件数据失败:', err);
+          return res.status(500).json({ error: '获取配件数据失败', details: err.message });
         }
+        console.log('衣柜配件数据:', items ? items.length : 0, '条');
+        
+        // 获取眼睛数据
+        db.all(`SELECT name, brand, price FROM eyes WHERE user_id = ? ORDER BY name`, [userId], (err, eyes) => {
+          if (err) {
+            console.error('获取眼睛数据失败:', err);
+          }
+          const eyesData = eyes || [];
+          console.log('眼睛数据:', eyesData.length, '条');
+          
+          // 获取假发数据
+          db.all(`SELECT name, brand, price FROM wigs WHERE user_id = ? ORDER BY name`, [userId], (err, wigs) => {
+            if (err) {
+              console.error('获取假发数据失败:', err);
+            }
+            const wigsData = wigs || [];
+            console.log('假发数据:', wigsData.length, '条');
         
         // CSV转义函数
         const escapeCsv = (str) => {
@@ -823,9 +845,21 @@ app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
         
         csvContent += '====== 衣柜配件列表 ======\n';
         csvContent += '类别,名称,品牌,价格\n';
+        
+        // 添加眼睛数据
+        eyesData.forEach(eye => {
+          csvContent += `${escapeCsv('眼睛')},${escapeCsv(eye.name)},${escapeCsv(eye.brand)},${escapeCsv(eye.price)}\n`;
+        });
+        
+        // 添加假发数据
+        wigsData.forEach(wig => {
+          csvContent += `${escapeCsv('假发')},${escapeCsv(wig.name)},${escapeCsv(wig.brand)},${escapeCsv(wig.price)}\n`;
+        });
+        
+        // 添加其他配件数据
         items.forEach(item => {
           const categoryName = categories[item.category] || item.category;
-          csvContent += `${escapeCsv(categoryName)},${escapeCsv(item.name)},${escapeCsv(item.brand)},${escapeCsv(item.purchase_price)}\n`;
+          csvContent += `${escapeCsv(categoryName)},${escapeCsv(item.name)},${escapeCsv(item.brand)},${escapeCsv(item.total_price)}\n`;
         });
         
         // 设置响应头
@@ -833,6 +867,8 @@ app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="doll_collection_${date}.csv"`);
         res.send(csvContent);
+          });
+        });
       });
     });
   });

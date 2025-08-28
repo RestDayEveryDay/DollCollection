@@ -143,7 +143,7 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
     try {
       const token = localStorage.getItem('token');
       const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api/export/all-data'
+        ? 'http://localhost:5001/api/export/all-data'
         : '/api/export/all-data';
       
       const response = await fetch(apiUrl, {

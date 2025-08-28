@@ -17,7 +17,7 @@ const getApiBaseUrl = () => {
   }
   
   // 本地开发环境
-  return 'http://localhost:5000'; // 主服务器端口
+  return 'http://localhost:5001'; // 主服务器端口
 };
 
 const API_BASE_URL = getApiBaseUrl();
