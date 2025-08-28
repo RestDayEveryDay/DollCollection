@@ -299,6 +299,26 @@
   color: var(--text-primary);
 }
 
+/* App顶部导航栏黑夜模式 - 使用暗色文字 */
+[data-theme='dark'] .app-header {
+  background: var(--color-primary);
+  color: #0d1117 !important;  /* 深黑色文字 */
+}
+
+[data-theme='dark'] .app-header span {
+  color: #0d1117 !important;  /* 欢迎文字改为深黑色 */
+}
+
+[data-theme='dark'] .logout-btn {
+  background: rgba(13, 17, 23, 0.2) !important;
+  color: #0d1117 !important;  /* 退出登录按钮文字改为深黑色 */
+  border: 1px solid rgba(13, 17, 23, 0.3) !important;
+}
+
+[data-theme='dark'] .logout-btn:hover {
+  background: rgba(13, 17, 23, 0.3) !important;
+}
+
 /* 确保文本在黑夜模式下可读 */
 [data-theme='dark'] h1,
 [data-theme='dark'] h2,
