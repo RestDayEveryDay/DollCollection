@@ -424,3 +424,73 @@
   background: rgba(13, 17, 23, 0.95);
   border-color: var(--border-primary);
 }
+
+/* 衣柜页面分类卡片 */
+[data-theme='dark'] .category-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .category-card:hover {
+  background: rgba(13, 17, 23, 0.95) !important;
+  border-color: var(--border-primary);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .category-info h3 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .category-stats {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .stat-item {
+  background: rgba(45, 74, 71, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .price-stat .amount {
+  color: var(--text-primary);
+}
+
+/* 搜索结果卡片 */
+[data-theme='dark'] .search-result-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .search-result-card:hover {
+  background: rgba(13, 17, 23, 0.95) !important;
+  border-color: var(--border-primary);
+}
+
+/* 统计卡片 */
+[data-theme='dark'] .stats-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stats-card:hover {
+  background: rgba(13, 17, 23, 0.95) !important;
+  border-color: var(--border-primary);
+}
+
+[data-theme='dark'] .stats-name {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stats-label {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .stats-value {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .amount-value {
+  color: var(--text-primary);
+}
