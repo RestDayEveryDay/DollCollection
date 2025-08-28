@@ -257,15 +257,23 @@
 [data-theme='dark'] .doll-card,
 [data-theme='dark'] .wardrobe-card,
 [data-theme='dark'] .detail-card {
-  background: rgba(13, 17, 23, 0.8);
+  background: rgba(13, 17, 23, 0.8) !important;
   border: 1px solid var(--border-secondary);
   color: var(--text-primary);
+}
+
+[data-theme='dark'] .wardrobe-card.owned {
+  background: rgba(13, 17, 23, 0.85) !important;
+}
+
+[data-theme='dark'] .wardrobe-card.preorder {
+  background: rgba(13, 17, 23, 0.85) !important;
 }
 
 [data-theme='dark'] .artist-card:hover,
 [data-theme='dark'] .doll-card:hover,
 [data-theme='dark'] .wardrobe-card:hover {
-  background: rgba(13, 17, 23, 0.95);
+  background: rgba(13, 17, 23, 0.95) !important;
   border-color: var(--border-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
@@ -343,4 +351,58 @@
 
 [data-theme='dark'] .favorite-btn {
   filter: brightness(1.2);
+}
+
+/* 衣柜页面特定样式 */
+[data-theme='dark'] .status-options {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .status-button {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .status-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .price-summary {
+  background: rgba(45, 74, 71, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .wardrobe-info h3 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .wardrobe-info p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .size-tag {
+  background: rgba(45, 74, 71, 0.2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .price-info {
+  background: rgba(45, 74, 71, 0.1);
+}
+
+[data-theme='dark'] .countdown-info {
+  background: rgba(45, 74, 71, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .overview-card {
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .overview-card:hover {
+  background: rgba(13, 17, 23, 0.95);
+  border-color: var(--border-primary);
 }
