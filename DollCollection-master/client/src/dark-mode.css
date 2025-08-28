@@ -132,14 +132,39 @@
   color: var(--text-secondary);
 }
 
-/* 黑夜模式下的尾款提醒卡片 */
+/* 黑夜模式下的尾款提醒卡片 - 强制覆盖 */
 [data-theme='dark'] .payment-reminder-card {
-  background: rgba(13, 17, 23, 0.8);
-  border: 1px solid var(--border-secondary);
+  background: rgba(13, 17, 23, 0.8) !important;
+  border: 1px solid var(--border-secondary) !important;
 }
 
 [data-theme='dark'] .payment-reminder-card:hover {
-  background: rgba(13, 17, 23, 0.95);
+  background: rgba(13, 17, 23, 0.95) !important;
+}
+
+[data-theme='dark'] .payment-reminder-card.overdue {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-color: #8b4444 !important;
+}
+
+[data-theme='dark'] .payment-reminder-card.today {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-color: #8b5500 !important;
+}
+
+[data-theme='dark'] .payment-reminder-card.urgent {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-color: #8b6600 !important;
+}
+
+[data-theme='dark'] .payment-reminder-card.no-date {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-color: #5555aa !important;
+}
+
+[data-theme='dark'] .payment-reminder-card.normal {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-color: #2a5a2f !important;
 }
 
 /* 黑夜模式下的相册卡片 */
@@ -304,6 +329,46 @@
   background: rgba(13, 17, 23, 0.95) !important;
   border-color: var(--border-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 妆师卡片内的信息样式 */
+[data-theme='dark'] .artist-info p {
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] .artist-info strong {
+  color: var(--text-secondary) !important;
+}
+
+/* 妆师卡片按钮 - 调暗颜色 */
+[data-theme='dark'] .artist-card .edit-btn {
+  background: #004a8b !important;
+  color: #c9d1d9 !important;
+}
+
+[data-theme='dark'] .artist-card .edit-btn:hover {
+  background: #003565 !important;
+  box-shadow: 0 4px 8px rgba(0, 74, 139, 0.3) !important;
+}
+
+[data-theme='dark'] .artist-card .delete-btn {
+  background: #8b2828 !important;
+  color: #c9d1d9 !important;
+}
+
+[data-theme='dark'] .artist-card .delete-btn:hover {
+  background: #651818 !important;
+  box-shadow: 0 4px 8px rgba(139, 40, 40, 0.3) !important;
+}
+
+/* 约妆卡片 */
+[data-theme='dark'] .appointment-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+  border: 1px solid var(--border-secondary) !important;
+}
+
+[data-theme='dark'] .appointment-card:hover {
+  background: rgba(13, 17, 23, 0.95) !important;
 }
 
 [data-theme='dark'] .add-form {
@@ -530,4 +595,40 @@
 
 [data-theme='dark'] .amount-value {
   color: var(--text-primary);
+}
+
+/* 妆师页面特殊样式 */
+[data-theme='dark'] .makeup-fee {
+  background: rgba(45, 74, 71, 0.2) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] .artist-name {
+  color: var(--text-primary) !important;
+}
+
+/* 详情弹窗按钮 */
+[data-theme='dark'] .detail-actions .edit-btn {
+  background: #004a8b !important;
+  color: #c9d1d9 !important;
+}
+
+[data-theme='dark'] .detail-actions .edit-btn:hover {
+  background: #003565 !important;
+}
+
+[data-theme='dark'] .favorite-btn-action {
+  background: #4a3a4a !important;
+  color: #c9d1d9 !important;
+}
+
+[data-theme='dark'] .favorite-btn-action:hover {
+  background: #5a4a5a !important;
+}
+
+/* 搜索框 */
+[data-theme='dark'] .makeup-page .search-input {
+  background: var(--bg-input) !important;
+  border: 2px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
 }
