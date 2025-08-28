@@ -331,34 +331,41 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* 妆师卡片内的信息样式 */
+/* 妆师卡片内的信息样式 - 确保没有白色背景 */
 [data-theme='dark'] .artist-info p {
   color: var(--text-primary) !important;
+  background: transparent !important;
 }
 
 [data-theme='dark'] .artist-info strong {
   color: var(--text-secondary) !important;
+  background: transparent !important;
 }
 
-/* 妆师卡片按钮 - 调暗颜色 */
+[data-theme='dark'] .artist-info span {
+  background: transparent !important;
+}
+
+[data-theme='dark'] .artist-info p * {
+  background: transparent !important;
+}
+
+/* 确保所有可能的白色背景元素都被覆盖 */
+[data-theme='dark'] .artist-card * {
+  background-color: transparent !important;
+}
+
+[data-theme='dark'] .artist-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+}
+
+/* 妆师卡片按钮 - 保持原色但微调透明度 */
 [data-theme='dark'] .artist-card .edit-btn {
-  background: #004a8b !important;
-  color: #c9d1d9 !important;
-}
-
-[data-theme='dark'] .artist-card .edit-btn:hover {
-  background: #003565 !important;
-  box-shadow: 0 4px 8px rgba(0, 74, 139, 0.3) !important;
+  opacity: 0.85;
 }
 
 [data-theme='dark'] .artist-card .delete-btn {
-  background: #8b2828 !important;
-  color: #c9d1d9 !important;
-}
-
-[data-theme='dark'] .artist-card .delete-btn:hover {
-  background: #651818 !important;
-  box-shadow: 0 4px 8px rgba(139, 40, 40, 0.3) !important;
+  opacity: 0.85;
 }
 
 /* 约妆卡片 */
@@ -607,23 +614,13 @@
   color: var(--text-primary) !important;
 }
 
-/* 详情弹窗按钮 */
+/* 详情弹窗按钮 - 保持原色但微调透明度 */
 [data-theme='dark'] .detail-actions .edit-btn {
-  background: #004a8b !important;
-  color: #c9d1d9 !important;
-}
-
-[data-theme='dark'] .detail-actions .edit-btn:hover {
-  background: #003565 !important;
+  opacity: 0.85;
 }
 
 [data-theme='dark'] .favorite-btn-action {
-  background: #4a3a4a !important;
-  color: #c9d1d9 !important;
-}
-
-[data-theme='dark'] .favorite-btn-action:hover {
-  background: #5a4a5a !important;
+  opacity: 0.85;
 }
 
 /* 搜索框 */
