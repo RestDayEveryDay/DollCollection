@@ -1,5 +1,17 @@
 /* ===== 黑夜模式专用样式 ===== */
 
+/* 确保根元素占满屏幕 */
+#root {
+  min-height: 100vh;
+  background: inherit;
+}
+
+/* 修复App容器 */
+.App {
+  min-height: 100vh;
+  background: inherit;
+}
+
 /* 主题切换按钮样式 */
 .theme-toggle-btn {
   width: 40px;
@@ -239,6 +251,11 @@
 }
 
 /* 登录页面黑夜模式 */
+[data-theme='dark'] .login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-primary-end) 100%);
+}
+
 [data-theme='dark'] .login-container {
   background: var(--bg-card);
   box-shadow: var(--shadow-lg);

@@ -76,6 +76,22 @@
   --shadow-colored: 0 4px 12px rgba(45, 74, 71, 0.3);
 }
 
+/* 应用到body和html */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+[data-theme='light'] body {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] body {
+  background: var(--bg-primary);
+}
+
 /* 过渡动画 */
 * {
   transition: background-color 0.3s ease, 
