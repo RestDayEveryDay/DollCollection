@@ -238,6 +238,43 @@
   background: rgba(45, 74, 71, 0.1);
 }
 
+/* 快捷添加按钮 - 更深的粉色 */
+[data-theme='dark'] .nav-add {
+  background: linear-gradient(135deg, #8b5d7a 0%, #6b4a5a 100%) !important;
+  box-shadow: 0 4px 20px rgba(139, 93, 122, 0.3);
+}
+
+[data-theme='dark'] .nav-add:hover {
+  background: linear-gradient(135deg, #9b6d8a 0%, #7b5a6a 100%) !important;
+  box-shadow: 0 6px 25px rgba(139, 93, 122, 0.4);
+}
+
+[data-theme='dark'] .nav-add.active {
+  background: linear-gradient(135deg, #7b4d6a 0%, #5b3a4a 100%) !important;
+}
+
+/* 添加菜单 */
+[data-theme='dark'] .add-menu {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .add-menu-item:hover {
+  background: rgba(45, 74, 71, 0.1);
+}
+
+[data-theme='dark'] .add-menu-text {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .add-back-button {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .add-back-button:hover {
+  background: rgba(45, 74, 71, 0.1);
+}
+
 /* App.css 中的通用组件黑夜模式 */
 [data-theme='dark'] .page-header {
   background: var(--color-primary);
