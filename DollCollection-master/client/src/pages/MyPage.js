@@ -141,9 +141,14 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
   // 导出所有数据
   const exportAllData = async () => {
     try {
-      const response = await fetch('/api/export/all-data', {
+      const token = localStorage.getItem('token');
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api/export/all-data'
+        : '/api/export/all-data';
+      
+      const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       

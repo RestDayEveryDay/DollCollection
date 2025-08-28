@@ -756,6 +756,7 @@ app.put('/api/albums/toggle-pin/:type/:id', auth.authMiddleware, (req, res) => {
 // 导出所有数据到CSV
 app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
   const userId = req.userId;
+  console.log('导出数据请求 - 用户ID:', userId);
   
   // 准备CSV内容
   let csvContent = '\ufeff'; // 添加BOM以支持中文
@@ -781,20 +782,31 @@ app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
           return res.status(500).json({ error: '获取配件数据失败' });
         }
         
+        // CSV转义函数
+        const escapeCsv = (str) => {
+          if (!str && str !== 0) return '';
+          const strVal = String(str);
+          // 如果包含逗号、引号或换行，需要用引号包围并转义内部引号
+          if (strVal.includes(',') || strVal.includes('"') || strVal.includes('\n')) {
+            return `"${strVal.replace(/"/g, '""')}"`;
+          }
+          return strVal;
+        };
+        
         // 构建CSV内容
         // 娃头部分
-        csvContent += '娃头列表\n';
+        csvContent += '====== 娃头列表 ======\n';
         csvContent += '名称,公司,价格\n';
         heads.forEach(head => {
-          csvContent += `"${head.name || ''}","${head.company || ''}","${head.actual_price || ''}"\n`;
+          csvContent += `${escapeCsv(head.name)},${escapeCsv(head.company)},${escapeCsv(head.actual_price)}\n`;
         });
         csvContent += '\n';
         
         // 娃体部分
-        csvContent += '娃体列表\n';
+        csvContent += '====== 娃体列表 ======\n';
         csvContent += '名称,公司,价格\n';
         bodies.forEach(body => {
-          csvContent += `"${body.name || ''}","${body.company || ''}","${body.actual_price || ''}"\n`;
+          csvContent += `${escapeCsv(body.name)},${escapeCsv(body.company)},${escapeCsv(body.actual_price)}\n`;
         });
         csvContent += '\n';
         
@@ -809,11 +821,11 @@ app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
           'handheld': '手持物'
         };
         
-        csvContent += '衣柜配件列表\n';
+        csvContent += '====== 衣柜配件列表 ======\n';
         csvContent += '类别,名称,品牌,价格\n';
         items.forEach(item => {
           const categoryName = categories[item.category] || item.category;
-          csvContent += `"${categoryName}","${item.name || ''}","${item.brand || ''}","${item.purchase_price || ''}"\n`;
+          csvContent += `${escapeCsv(categoryName)},${escapeCsv(item.name)},${escapeCsv(item.brand)},${escapeCsv(item.purchase_price)}\n`;
         });
         
         // 设置响应头
