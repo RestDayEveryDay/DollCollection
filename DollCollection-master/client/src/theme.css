@@ -49,14 +49,14 @@
   --bg-modal: #1c2128;
   --bg-input: #0d1117;
   
-  /* 主题色 - 使用更亮的颜色以提高对比度 */
-  --color-primary: #58a6ff;
-  --color-primary-dark: #388bfd;
-  --color-secondary: #8b7aa8;
-  --color-accent: #f78166;
-  --color-success: #56d364;
-  --color-warning: #f85149;
-  --color-info: #79c0ff;
+  /* 主题色 - 降低饱和度和亮度 */
+  --color-primary: #2d4a47;
+  --color-primary-dark: #1e3633;
+  --color-secondary: #4a3a4a;
+  --color-accent: #8b5d7a;
+  --color-success: #3a5a4a;
+  --color-warning: #8b5a5d;
+  --color-info: #4a6a7a;
   
   /* 文字色 */
   --text-primary: #c9d1d9;
