@@ -81,19 +81,19 @@
 [data-theme='dark'] .expense-section,
 [data-theme='dark'] .payment-reminders-section,
 [data-theme='dark'] .albums-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
+  background: rgba(13, 17, 23, 0.5);
+  border: 1px solid var(--border-secondary);
 }
 
 [data-theme='dark'] .expense-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
+  background: rgba(13, 17, 23, 0.7);
+  border: 1px solid var(--border-secondary);
   color: var(--text-primary);
 }
 
 [data-theme='dark'] .expense-card:hover {
-  background: var(--bg-hover);
-  border-color: var(--color-primary);
+  background: rgba(13, 17, 23, 0.9);
+  border-color: var(--border-primary);
 }
 
 [data-theme='dark'] .card-title {
@@ -134,22 +134,23 @@
 
 /* 黑夜模式下的尾款提醒卡片 */
 [data-theme='dark'] .payment-reminder-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--border-secondary);
 }
 
 [data-theme='dark'] .payment-reminder-card:hover {
-  background: var(--bg-hover);
+  background: rgba(13, 17, 23, 0.95);
 }
 
 /* 黑夜模式下的相册卡片 */
 [data-theme='dark'] .album-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--border-secondary);
 }
 
 [data-theme='dark'] .album-card:hover {
-  border-color: var(--color-primary);
+  background: rgba(13, 17, 23, 0.95);
+  border-color: var(--border-primary);
 }
 
 [data-theme='dark'] .album-card-header {
@@ -256,17 +257,17 @@
 [data-theme='dark'] .doll-card,
 [data-theme='dark'] .wardrobe-card,
 [data-theme='dark'] .detail-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--border-secondary);
   color: var(--text-primary);
 }
 
 [data-theme='dark'] .artist-card:hover,
 [data-theme='dark'] .doll-card:hover,
 [data-theme='dark'] .wardrobe-card:hover {
-  background: var(--bg-hover);
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-colored);
+  background: rgba(13, 17, 23, 0.95);
+  border-color: var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme='dark'] .add-form {

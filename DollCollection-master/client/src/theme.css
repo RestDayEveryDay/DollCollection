@@ -43,11 +43,11 @@
   /* 背景色 */
   --bg-primary: #0d1117;
   --bg-primary-end: #161b22;
-  --bg-secondary: #1c2128;
-  --bg-card: #1c2128;
-  --bg-hover: #262c36;
-  --bg-modal: #1c2128;
-  --bg-input: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-card: #0d1117;
+  --bg-hover: #1c2128;
+  --bg-modal: #161b22;
+  --bg-input: #010409;
   
   /* 主题色 - 降低饱和度和亮度 */
   --color-primary: #2d4a47;
@@ -65,9 +65,9 @@
   --text-inverse: #0d1117;
   
   /* 边框色 */
-  --border-primary: #30363d;
-  --border-secondary: #21262d;
-  --border-light: rgba(240, 246, 252, 0.1);
+  --border-primary: #21262d;
+  --border-secondary: #161b22;
+  --border-light: rgba(240, 246, 252, 0.05);
   
   /* 阴影 */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
