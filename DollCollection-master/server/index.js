@@ -753,6 +753,79 @@ app.put('/api/albums/toggle-pin/:type/:id', auth.authMiddleware, (req, res) => {
   );
 });
 
+// 导出所有数据到CSV
+app.get('/api/export/all-data', auth.authMiddleware, (req, res) => {
+  const userId = req.userId;
+  
+  // 准备CSV内容
+  let csvContent = '\ufeff'; // 添加BOM以支持中文
+  
+  // 获取所有娃头数据
+  db.all('SELECT name, company, actual_price FROM doll_heads WHERE user_id = ? ORDER BY name', [userId], (err, heads) => {
+    if (err) {
+      return res.status(500).json({ error: '获取娃头数据失败' });
+    }
+    
+    // 获取所有娃体数据
+    db.all('SELECT name, company, actual_price FROM doll_bodies WHERE user_id = ? ORDER BY name', [userId], (err, bodies) => {
+      if (err) {
+        return res.status(500).json({ error: '获取娃体数据失败' });
+      }
+      
+      // 获取所有配件数据
+      db.all(`SELECT name, category, brand, purchase_price 
+              FROM wardrobe_items 
+              WHERE user_id = ? 
+              ORDER BY category, name`, [userId], (err, items) => {
+        if (err) {
+          return res.status(500).json({ error: '获取配件数据失败' });
+        }
+        
+        // 构建CSV内容
+        // 娃头部分
+        csvContent += '娃头列表\n';
+        csvContent += '名称,公司,价格\n';
+        heads.forEach(head => {
+          csvContent += `"${head.name || ''}","${head.company || ''}","${head.actual_price || ''}"\n`;
+        });
+        csvContent += '\n';
+        
+        // 娃体部分
+        csvContent += '娃体列表\n';
+        csvContent += '名称,公司,价格\n';
+        bodies.forEach(body => {
+          csvContent += `"${body.name || ''}","${body.company || ''}","${body.actual_price || ''}"\n`;
+        });
+        csvContent += '\n';
+        
+        // 配件部分 - 按类别分组
+        const categories = {
+          'body_accessories': '配饰',
+          'eyes': '眼睛',
+          'wigs': '假发',
+          'headwear': '头饰',
+          'sets': '套装',
+          'single_items': '单品',
+          'handheld': '手持物'
+        };
+        
+        csvContent += '衣柜配件列表\n';
+        csvContent += '类别,名称,品牌,价格\n';
+        items.forEach(item => {
+          const categoryName = categories[item.category] || item.category;
+          csvContent += `"${categoryName}","${item.name || ''}","${item.brand || ''}","${item.purchase_price || ''}"\n`;
+        });
+        
+        // 设置响应头
+        const date = new Date().toISOString().split('T')[0];
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="doll_collection_${date}.csv"`);
+        res.send(csvContent);
+      });
+    });
+  });
+});
+
 // 获取相册照片数量和数据
 app.get('/api/albums/photo-count/:id', auth.authMiddleware, (req, res) => {
   const { id } = req.params;

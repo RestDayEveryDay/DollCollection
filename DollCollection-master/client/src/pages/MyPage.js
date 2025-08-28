@@ -137,6 +137,42 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
     // 保存到localStorage
     localStorage.setItem('myPageCollapsedSections', JSON.stringify(newState));
   };
+  
+  // 导出所有数据
+  const exportAllData = async () => {
+    try {
+      const response = await fetch('/api/export/all-data', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('导出失败');
+      }
+      
+      // 获取文件名
+      const contentDisposition = response.headers.get('content-disposition');
+      const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+      const filename = filenameMatch ? filenameMatch[1] : `doll_collection_${new Date().toISOString().split('T')[0]}.csv`;
+      
+      // 下载文件
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      alert('数据导出成功！');
+    } catch (error) {
+      console.error('导出失败:', error);
+      alert('导出失败，请稍后重试');
+    }
+  };
 
   useEffect(() => {
     fetchExpenseStats();
@@ -520,12 +556,21 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
             </div>
             <div className="profile-subtitle">收藏管理 & 花费统计</div>
           </div>
-          <button 
-            className="header-logout-btn"
-            onClick={onLogout}
-          >
-            退出登录
-          </button>
+          <div className="header-actions">
+            <button 
+              className="header-export-btn"
+              onClick={exportAllData}
+              title="导出所有数据到CSV文件"
+            >
+              导出数据
+            </button>
+            <button 
+              className="header-logout-btn"
+              onClick={onLogout}
+            >
+              退出登录
+            </button>
+          </div>
         </div>
       </div>
 
