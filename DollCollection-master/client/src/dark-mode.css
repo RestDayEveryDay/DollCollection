@@ -255,19 +255,10 @@
 
 [data-theme='dark'] .artist-card,
 [data-theme='dark'] .doll-card,
-[data-theme='dark'] .wardrobe-card,
 [data-theme='dark'] .detail-card {
   background: rgba(13, 17, 23, 0.8) !important;
   border: 1px solid var(--border-secondary);
   color: var(--text-primary);
-}
-
-[data-theme='dark'] .wardrobe-card.owned {
-  background: rgba(13, 17, 23, 0.85) !important;
-}
-
-[data-theme='dark'] .wardrobe-card.preorder {
-  background: rgba(13, 17, 23, 0.85) !important;
 }
 
 [data-theme='dark'] .artist-card:hover,
@@ -353,47 +344,74 @@
   filter: brightness(1.2);
 }
 
-/* 衣柜页面特定样式 */
+/* 衣柜页面特定样式 - 加强优先级 */
 [data-theme='dark'] .status-options {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
 }
 
 [data-theme='dark'] .status-button {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme='dark'] .status-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 [data-theme='dark'] .price-summary {
-  background: rgba(45, 74, 71, 0.1);
-  border: 1px solid var(--border-primary);
+  background: rgba(45, 74, 71, 0.1) !important;
+  border: 1px solid var(--border-primary) !important;
 }
 
 [data-theme='dark'] .wardrobe-info h3 {
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
 }
 
 [data-theme='dark'] .wardrobe-info p {
-  color: var(--text-secondary);
+  color: var(--text-secondary) !important;
 }
 
 [data-theme='dark'] .size-tag {
-  background: rgba(45, 74, 71, 0.2);
-  color: var(--text-primary);
-  border: 1px solid var(--border-primary);
+  background: rgba(45, 74, 71, 0.2) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-primary) !important;
 }
 
 [data-theme='dark'] .price-info {
-  background: rgba(45, 74, 71, 0.1);
+  background: rgba(45, 74, 71, 0.1) !important;
 }
 
 [data-theme='dark'] .countdown-info {
-  background: rgba(45, 74, 71, 0.1);
-  border: 1px solid var(--border-primary);
+  background: rgba(45, 74, 71, 0.1) !important;
+  border: 1px solid var(--border-primary) !important;
+}
+
+/* 衣柜卡片暗色背景 - 确保覆盖 */
+[data-theme='dark'] .wardrobe-card {
+  background: rgba(13, 17, 23, 0.8) !important;
+}
+
+[data-theme='dark'] .wardrobe-card.owned {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-left: 4px solid #3a5a4a !important;
+}
+
+[data-theme='dark'] .wardrobe-card.preorder {
+  background: rgba(13, 17, 23, 0.85) !important;
+  border-left: 4px solid #8b5d7a !important;
+}
+
+/* 搜索框 */
+[data-theme='dark'] .search-input {
+  background: var(--bg-input) !important;
+  border: 2px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme='dark'] .search-input:focus {
+  border-color: var(--color-primary) !important;
+  background: var(--bg-secondary) !important;
 }
 
 [data-theme='dark'] .overview-card {

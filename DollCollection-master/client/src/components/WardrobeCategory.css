@@ -354,11 +354,11 @@
 }
 
 .wardrobe-card.owned {
-  background: #e2f9ef !important;
+  background: #e2f9ef;
 }
 
 .wardrobe-card.preorder {
-  background: #f9e2ef !important;
+  background: #f9e2ef;
 }
 
 .wardrobe-card:hover {
