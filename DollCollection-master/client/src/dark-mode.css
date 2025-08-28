@@ -1,0 +1,274 @@
+/* ===== 黑夜模式专用样式 ===== */
+
+/* 主题切换按钮样式 */
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* 黑夜模式下的主题切换按钮 */
+[data-theme='dark'] .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* MyPage 黑夜模式适配 */
+[data-theme='dark'] .profile-username h2 {
+  color: white;
+}
+
+[data-theme='dark'] .profile-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme='dark'] .expense-section,
+[data-theme='dark'] .payment-reminders-section,
+[data-theme='dark'] .albums-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .expense-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .expense-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+}
+
+[data-theme='dark'] .card-title {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .card-amount {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .detail-label {
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .detail-value {
+  color: var(--text-primary);
+}
+
+/* 黑夜模式下的折叠标题 */
+[data-theme='dark'] .section-title.collapsible {
+  background: linear-gradient(135deg, rgba(45, 74, 71, 0.08) 0%, rgba(45, 74, 71, 0.05) 100%);
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .section-title.collapsible:hover {
+  background: linear-gradient(135deg, rgba(45, 74, 71, 0.12) 0%, rgba(45, 74, 71, 0.08) 100%);
+}
+
+[data-theme='dark'] .collapse-icon {
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .section-summary {
+  background: rgba(45, 74, 71, 0.15);
+  color: var(--text-secondary);
+}
+
+/* 黑夜模式下的尾款提醒卡片 */
+[data-theme='dark'] .payment-reminder-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .payment-reminder-card:hover {
+  background: var(--bg-hover);
+}
+
+/* 黑夜模式下的相册卡片 */
+[data-theme='dark'] .album-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .album-card:hover {
+  border-color: var(--color-primary);
+}
+
+[data-theme='dark'] .album-card-header {
+  background: rgba(45, 74, 71, 0.1);
+}
+
+[data-theme='dark'] .album-name {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .album-company {
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .album-stats {
+  color: var(--text-secondary);
+}
+
+/* 黑夜模式下的Modal弹窗 */
+[data-theme='dark'] .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme='dark'] .modal-content,
+[data-theme='dark'] .album-detail-modal {
+  background: var(--bg-modal);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .modal-header {
+  border-bottom: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .modal-footer {
+  border-top: 1px solid var(--border-primary);
+}
+
+/* 黑夜模式下的输入框 */
+[data-theme='dark'] input,
+[data-theme='dark'] select,
+[data-theme='dark'] textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] input:focus,
+[data-theme='dark'] select:focus,
+[data-theme='dark'] textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--bg-secondary);
+}
+
+/* 黑夜模式下的按钮 */
+[data-theme='dark'] .header-export-btn {
+  background: linear-gradient(135deg, rgba(58, 90, 74, 0.9) 0%, rgba(42, 70, 58, 0.9) 100%);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .header-export-btn:hover {
+  background: linear-gradient(135deg, rgba(42, 70, 58, 0.95) 0%, rgba(30, 54, 42, 0.95) 100%);
+}
+
+[data-theme='dark'] .header-logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .header-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 底部导航黑夜模式 */
+[data-theme='dark'] .bottom-nav {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .nav-item {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .nav-item.active {
+  color: var(--color-primary);
+  background: rgba(45, 74, 71, 0.1);
+}
+
+/* App.css 中的通用组件黑夜模式 */
+[data-theme='dark'] .page-header {
+  background: var(--color-secondary);
+  color: var(--text-inverse);
+}
+
+[data-theme='dark'] .artist-card,
+[data-theme='dark'] .doll-card,
+[data-theme='dark'] .wardrobe-card,
+[data-theme='dark'] .detail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .artist-card:hover,
+[data-theme='dark'] .doll-card:hover,
+[data-theme='dark'] .wardrobe-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-colored);
+}
+
+[data-theme='dark'] .add-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .company-header {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-hover) 100%);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+[data-theme='dark'] .company-group {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+}
+
+/* 登录页面黑夜模式 */
+[data-theme='dark'] .login-container {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme='dark'] .login-title {
+  color: var(--text-primary);
+}
+
+/* 确保文本在黑夜模式下可读 */
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] p,
+[data-theme='dark'] span,
+[data-theme='dark'] div {
+  color: var(--text-primary);
+}
+
+/* 修复一些特定元素的对比度问题 */
+[data-theme='dark'] .status-badge {
+  filter: brightness(0.8);
+}
+
+[data-theme='dark'] .favorite-btn {
+  filter: brightness(1.2);
+}

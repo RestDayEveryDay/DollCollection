@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { authFetch } from './utils/api';
+import './theme.css';
 import './App.css';
+import './dark-mode.css';
+import { ThemeProvider } from './contexts/ThemeContext';
 import BottomNav from './components/BottomNav';
 import Login from './components/Login';
 import DollsPage from './pages/DollsPage';
@@ -227,4 +230,13 @@ function App() {
   );
 }
 
-export default App;
+// 包装App组件使用ThemeProvider
+function AppWithTheme() {
+  return (
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  );
+}
+
+export default AppWithTheme;

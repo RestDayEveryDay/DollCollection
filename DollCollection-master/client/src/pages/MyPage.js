@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './MyPage.css';
 import { apiGet, apiPut, apiPost } from '../utils/api';
 import ImageUpload from '../components/ImageUpload';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   DndContext, 
   closestCenter,
@@ -94,6 +95,7 @@ const SortableAlbumCard = ({ album, onTogglePin, onClick }) => {
 
 
 const MyPage = ({ onNavigate, currentUser, onLogout }) => {
+  const { theme, toggleTheme } = useTheme();
   const [expenseStats, setExpenseStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentReminders, setPaymentReminders] = useState([]);
@@ -562,6 +564,13 @@ const MyPage = ({ onNavigate, currentUser, onLogout }) => {
             <div className="profile-subtitle">收藏管理 & 花费统计</div>
           </div>
           <div className="header-actions">
+            <button 
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              title={theme === 'light' ? '切换到黑夜模式' : '切换到白天模式'}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
             <button 
               className="header-export-btn"
               onClick={exportAllData}

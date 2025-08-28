@@ -1,20 +1,18 @@
 /* 页面背景 */
 .page-content {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-primary-end) 100%);
   min-height: 100vh;
   padding: 20px;
 }
 
 /* 新版顶部用户信息区域 */
 .profile-header {
-  background: linear-gradient(135deg, #aed9d8 0%, #9bc9c8 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 30px;
-  box-shadow: 
-    0 4px 12px rgba(174, 217, 216, 0.25),
-    0 8px 20px rgba(174, 217, 216, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-colored);
+  border: 1px solid var(--border-light);
 }
 
 .profile-header-content {

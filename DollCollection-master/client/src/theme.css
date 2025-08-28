@@ -1,0 +1,85 @@
+/* ===== CSS变量主题系统 ===== */
+
+/* 默认白天模式 */
+:root[data-theme='light'] {
+  /* 背景色 */
+  --bg-primary: #f5f7fa;
+  --bg-primary-end: #e9ecef;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f8f9fa;
+  --bg-modal: #ffffff;
+  --bg-input: #ffffff;
+  
+  /* 主题色 */
+  --color-primary: #aed9d8;
+  --color-primary-dark: #9bc9c8;
+  --color-secondary: #C8A2C8;
+  --color-accent: #FFB3E6;
+  --color-success: #A8D8B8;
+  --color-warning: #FFB3BA;
+  --color-info: #87CEEB;
+  
+  /* 文字色 */
+  --text-primary: #212529;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --text-inverse: #ffffff;
+  
+  /* 边框色 */
+  --border-primary: #dee2e6;
+  --border-secondary: #e9ecef;
+  --border-light: rgba(0, 0, 0, 0.06);
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 20px rgba(0, 0, 0, 0.1), 0 8px 12px rgba(0, 0, 0, 0.08);
+  --shadow-colored: 0 4px 12px rgba(174, 217, 216, 0.25);
+}
+
+/* 黑夜模式 */
+:root[data-theme='dark'] {
+  /* 背景色 */
+  --bg-primary: #0d1117;
+  --bg-primary-end: #161b22;
+  --bg-secondary: #1c2128;
+  --bg-card: #1c2128;
+  --bg-hover: #262c36;
+  --bg-modal: #1c2128;
+  --bg-input: #0d1117;
+  
+  /* 主题色 - 降低饱和度和亮度 */
+  --color-primary: #2d4a47;
+  --color-primary-dark: #1e3633;
+  --color-secondary: #4a3a4a;
+  --color-accent: #8b5d7a;
+  --color-success: #3a5a4a;
+  --color-warning: #8b5a5d;
+  --color-info: #4a6a7a;
+  
+  /* 文字色 */
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --text-inverse: #0d1117;
+  
+  /* 边框色 */
+  --border-primary: #30363d;
+  --border-secondary: #21262d;
+  --border-light: rgba(240, 246, 252, 0.1);
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 20px rgba(0, 0, 0, 0.5), 0 8px 12px rgba(0, 0, 0, 0.4);
+  --shadow-colored: 0 4px 12px rgba(45, 74, 71, 0.3);
+}
+
+/* 过渡动画 */
+* {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
